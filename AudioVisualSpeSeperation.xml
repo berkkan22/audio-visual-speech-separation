@@ -1,0 +1,189 @@
+<!DOCTYPE patchbay>
+<patchbay name="AudioVisualSpeSeperation" version="0.9.4">
+ <output-sockets>
+  <socket name="system" exclusive="off" type="jack-audio" client="system">
+   <plug>capture_1</plug>
+   <plug>capture_2</plug>
+   <plug>capture_3</plug>
+   <plug>capture_4</plug>
+   <plug>capture_5</plug>
+   <plug>capture_6</plug>
+   <plug>capture_7</plug>
+   <plug>capture_8</plug>
+   <plug>capture_9</plug>
+   <plug>capture_10</plug>
+   <plug>capture_11</plug>
+   <plug>capture_12</plug>
+   <plug>capture_13</plug>
+   <plug>capture_14</plug>
+   <plug>capture_15</plug>
+   <plug>capture_16</plug>
+   <plug>capture_17</plug>
+   <plug>capture_18</plug>
+   <plug>capture_19</plug>
+   <plug>capture_20</plug>
+   <plug>capture_21</plug>
+   <plug>capture_22</plug>
+   <plug>capture_23</plug>
+   <plug>capture_24</plug>
+   <plug>capture_25</plug>
+   <plug>capture_26</plug>
+   <plug>capture_27</plug>
+   <plug>capture_28</plug>
+  </socket>
+  <socket name="MonitorController" exclusive="off" type="jack-audio" client="MonitorController">
+   <plug>HeadphoneL</plug>
+   <plug>HeadphoneR</plug>
+   <plug>SpeakerL</plug>
+   <plug>SpeakerR</plug>
+   <plug>TalkbackOut</plug>
+  </socket>
+  <socket name="Leveler" exclusive="off" type="jack-audio" client="Leveler">
+   <plug>Out1</plug>
+   <plug>Out2</plug>
+   <plug>Out3</plug>
+  </socket>
+  <socket name="VirtualSources" exclusive="off" type="jack-audio" client="VirtualSources">
+   <plug>Source0</plug>
+   <plug>Source1</plug>
+   <plug>Source2</plug>
+  </socket>
+  <socket name="AVSS" exclusive="off" type="jack-audio" client="AVSS">
+   <plug>speaker1</plug>
+   <plug>speaker2</plug>
+  </socket>
+  <socket name="system 2" exclusive="off" type="jack-audio" client="system">
+   <plug>capture_7</plug>
+  </socket>
+  <socket name="system 3" exclusive="off" type="jack-audio" client="system">
+   <plug>capture_13</plug>
+  </socket>
+  <socket name="Leveler 2" exclusive="off" type="jack-audio" client="Leveler">
+   <plug>Out1</plug>
+   <plug>Out1</plug>
+   <plug>Out2</plug>
+   <plug>Out2</plug>
+   <plug>Out3</plug>
+   <plug>Out3</plug>
+  </socket>
+  <socket name="MonitorController 2" exclusive="off" type="jack-audio" client="MonitorController">
+   <plug>SpeakerL</plug>
+   <plug>SpeakerR</plug>
+   <plug>TalkbackOut</plug>
+  </socket>
+  <socket name="a2j_bridge" exclusive="off" type="jack-midi" client="a2j_bridge">
+   <plug>capture</plug>
+  </socket>
+  <socket name="Midi Through" exclusive="off" type="alsa-midi" client="Midi\ Through">
+   <plug>Midi\ Through\ Port\-0</plug>
+  </socket>
+  <socket name="Fireface800" exclusive="off" type="alsa-midi" client="Fireface800">
+   <plug>Fireface800\ MIDI\ 1</plug>
+  </socket>
+  <socket name="X-TOUCH COMPACT" exclusive="off" type="alsa-midi" client="X\-TOUCH\ COMPACT">
+   <plug>X\-TOUCH\ COMPACT\ MIDI\ 1</plug>
+  </socket>
+ </output-sockets>
+ <input-sockets>
+  <socket name="system" exclusive="off" type="jack-audio" client="system">
+   <plug>playback_1</plug>
+   <plug>playback_2</plug>
+   <plug>playback_3</plug>
+   <plug>playback_4</plug>
+   <plug>playback_5</plug>
+   <plug>playback_6</plug>
+   <plug>playback_7</plug>
+   <plug>playback_8</plug>
+   <plug>playback_9</plug>
+   <plug>playback_10</plug>
+   <plug>playback_11</plug>
+   <plug>playback_12</plug>
+   <plug>playback_13</plug>
+   <plug>playback_14</plug>
+   <plug>playback_15</plug>
+   <plug>playback_16</plug>
+   <plug>playback_17</plug>
+   <plug>playback_18</plug>
+   <plug>playback_19</plug>
+   <plug>playback_20</plug>
+   <plug>playback_21</plug>
+   <plug>playback_22</plug>
+   <plug>playback_23</plug>
+   <plug>playback_24</plug>
+   <plug>playback_25</plug>
+   <plug>playback_26</plug>
+   <plug>playback_27</plug>
+   <plug>playback_28</plug>
+  </socket>
+  <socket name="MonitorController" exclusive="off" type="jack-audio" client="MonitorController">
+   <plug>InL</plug>
+   <plug>InR</plug>
+   <plug>TalkbackIn</plug>
+   <plug>ListenbackIn</plug>
+  </socket>
+  <socket name="Leveler" exclusive="off" type="jack-audio" client="Leveler">
+   <plug>In1</plug>
+   <plug>In2</plug>
+   <plug>In3</plug>
+  </socket>
+  <socket name="AVSS" exclusive="off" type="jack-audio" client="AVSS">
+   <plug>mixed_speech</plug>
+  </socket>
+  <socket name="MonitorController 2" exclusive="off" type="jack-audio" client="MonitorController">
+   <plug>TalkbackIn</plug>
+  </socket>
+  <socket name="MonitorController 3" exclusive="off" type="jack-audio" client="MonitorController">
+   <plug>InL</plug>
+   <plug>InR</plug>
+   <plug>InL</plug>
+   <plug>InR</plug>
+   <plug>InL</plug>
+   <plug>InR</plug>
+  </socket>
+  <socket name="system 2" exclusive="off" type="jack-audio" client="system">
+   <plug>playback_1</plug>
+   <plug>playback_2</plug>
+   <plug>playback_15</plug>
+  </socket>
+  <socket name="system 3" exclusive="off" type="jack-audio" client="system">
+   <plug>playback_13</plug>
+   <plug>playback_14</plug>
+   <plug>playback_15</plug>
+  </socket>
+  <socket name="MonitorController" exclusive="off" type="jack-midi" client="MonitorController">
+   <plug>midiIn</plug>
+  </socket>
+  <socket name="Leveler" exclusive="off" type="jack-midi" client="Leveler">
+   <plug>midiIn</plug>
+  </socket>
+  <socket name="VirtualSources" exclusive="off" type="jack-midi" client="VirtualSources">
+   <plug>midiIn</plug>
+  </socket>
+  <socket name="Midi Through" exclusive="off" type="alsa-midi" client="Midi\ Through">
+   <plug>Midi\ Through\ Port\-0</plug>
+  </socket>
+  <socket name="Fireface800" exclusive="off" type="alsa-midi" client="Fireface800">
+   <plug>Fireface800\ MIDI\ 1</plug>
+  </socket>
+  <socket name="X-TOUCH COMPACT" exclusive="off" type="alsa-midi" client="X\-TOUCH\ COMPACT">
+   <plug>X\-TOUCH\ COMPACT\ MIDI\ 1</plug>
+  </socket>
+  <socket name="a2j_bridge" exclusive="off" type="alsa-midi" client="a2j_bridge">
+   <plug>playback</plug>
+  </socket>
+ </input-sockets>
+ <slots/>
+ <cables>
+  <cable input="system 3" type="jack-audio" output="VirtualSources"/>
+  <cable input="Leveler" type="jack-audio" output="AVSS"/>
+  <cable input="MonitorController 2" type="jack-audio" output="system 2"/>
+  <cable input="AVSS" type="jack-audio" output="system 3"/>
+  <cable input="MonitorController 3" type="jack-audio" output="Leveler 2"/>
+  <cable output="MonitorController 2" input="system 2" type="jack-audio"/>
+  <cable input="Leveler" type="jack-midi" output="a2j_bridge"/>
+  <cable input="MonitorController" type="jack-midi" output="a2j_bridge"/>
+  <cable input="VirtualSources" type="jack-midi" output="a2j_bridge"/>
+  <cable input="a2j_bridge" type="alsa-midi" output="X-TOUCH COMPACT"/>
+ </cables>
+</patchbay>
+
