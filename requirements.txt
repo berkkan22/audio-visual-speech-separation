@@ -1,0 +1,5 @@
+cffi==1.15.1
+JACK-Client==0.5.4
+numpy==1.23.4
+opencv-python==4.6.0.66
+pycparser==2.21
