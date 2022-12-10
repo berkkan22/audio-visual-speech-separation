@@ -1,0 +1,10 @@
+/usr/bin/qjackctl -a JACKPatchbayConnections/SpeechDerDemoStereo.xml
+
+bash -c "echo ḾIDI Bridge launched. Keep Terminal open for MIDI; a2jmidi_bridge"
+
+bash -c 'cd ~/anaconda3/bin;source activate base; python /export/scratch/studio/StudioScripts/Resources/jack-clients/jackClient_monitorController.py 100 100;'
+
+bash -c 'cd ~/anaconda3/bin;source activate base; python /export/scratch/studio/StudioScripts/Resources/jack-clients/jackClient_leveler.py Spk1 -20 Spk2 -20 Noise -80 3100 500'
+
+bash -c 'cd ~/anaconda3/bin;source activate base; python /export/scratch/studio/StudioScripts/Resources/jack-clients/jackClient_multiAudioPlayer.py /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav -80 /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Male01.wav -80 /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/Noise_Factory.wav -80 2400 500'
+

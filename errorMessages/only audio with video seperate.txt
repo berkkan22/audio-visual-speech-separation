@@ -1,0 +1,129 @@
+Wed Nov  2 14:55:16 2022: Connecting 'a2j_bridge:capture' to 'VirtualSources:midiIn'
+14:55:54.988 JACK connection graph change.
+14:55:55.028 JACK active patchbay scan...
+14:55:55.029 AudioVisualSpeSeperation: VirtualSources:Source0 -> system:playback_13 checked.
+14:55:55.029 AudioVisualSpeSeperation: VirtualSources:Source1 -> system:playback_14 checked.
+14:55:55.030 AudioVisualSpeSeperation: VirtualSources:Source2 -> system:playback_15 checked.
+14:55:55.030 AudioVisualSpeSeperation: system:capture_7 -> MonitorController:TalkbackIn checked.
+14:55:55.030 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InL checked.
+14:55:55.031 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InR checked.
+14:55:55.031 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InL checked.
+14:55:55.032 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InR checked.
+14:55:55.032 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InL checked.
+14:55:55.032 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InR checked.
+14:55:55.033 AudioVisualSpeSeperation: MonitorController:SpeakerL -> system:playback_1 checked.
+14:55:55.033 AudioVisualSpeSeperation: MonitorController:SpeakerR -> system:playback_2 checked.
+14:55:55.033 AudioVisualSpeSeperation: MonitorController:TalkbackOut -> system:playback_15 checked.
+14:55:55.034 AudioVisualSpeSeperation: a2j_bridge:capture -> Leveler:midiIn checked.
+14:55:55.034 AudioVisualSpeSeperation: a2j_bridge:capture -> MonitorController:midiIn checked.
+14:55:55.034 AudioVisualSpeSeperation: a2j_bridge:capture -> VirtualSources:midiIn checked.
+14:55:55.071 JACK connection graph change.
+Wed Nov  2 14:55:54 2022: New client 'AVSS' with PID 2284106
+Wed Nov  2 14:55:55 2022: Connecting 'system:capture_1' to 'AVSS:mixed_speech'
+Wed Nov  2 14:55:55 2022: Connecting 'AVSS:speaker1' to 'system:playback_1'
+Wed Nov  2 14:55:55 2022: Connecting 'AVSS:speaker2' to 'system:playback_2'
+14:55:55.242 JACK active patchbay scan...
+14:55:55.243 AudioVisualSpeSeperation: VirtualSources:Source0 -> system:playback_13 checked.
+14:55:55.244 AudioVisualSpeSeperation: VirtualSources:Source1 -> system:playback_14 checked.
+14:55:55.244 AudioVisualSpeSeperation: VirtualSources:Source2 -> system:playback_15 checked.
+14:55:55.247 AudioVisualSpeSeperation: AVSS:speaker1 -> Leveler:In1 connected.
+14:55:55.261 AudioVisualSpeSeperation: AVSS:speaker2 -> Leveler:In2 connected.
+14:55:55.271 AudioVisualSpeSeperation: system:capture_7 -> MonitorController:TalkbackIn checked.
+14:55:55.274 AudioVisualSpeSeperation: system:capture_13 -> AVSS:mixed_speech connected.
+14:55:55.284 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InL checked.
+14:55:55.285 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InR checked.
+14:55:55.286 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InL checked.
+14:55:55.287 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InR checked.
+14:55:55.288 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InL checked.
+14:55:55.288 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InR checked.
+14:55:55.289 AudioVisualSpeSeperation: MonitorController:SpeakerL -> system:playback_1 checked.
+14:55:55.289 AudioVisualSpeSeperation: MonitorController:SpeakerR -> system:playback_2 checked.
+14:55:55.289 AudioVisualSpeSeperation: MonitorController:TalkbackOut -> system:playback_15 checked.
+14:55:55.290 AudioVisualSpeSeperation: a2j_bridge:capture -> Leveler:midiIn checked.
+14:55:55.290 AudioVisualSpeSeperation: a2j_bridge:capture -> MonitorController:midiIn checked.
+14:55:55.290 AudioVisualSpeSeperation: a2j_bridge:capture -> VirtualSources:midiIn checked.
+14:55:55.291 JACK connection change.
+14:55:55.297 JACK connection graph change.
+14:55:55.500 JACK active patchbay scan...
+14:55:55.502 AudioVisualSpeSeperation: VirtualSources:Source0 -> system:playback_13 checked.
+14:55:55.503 AudioVisualSpeSeperation: VirtualSources:Source1 -> system:playback_14 checked.
+14:55:55.504 AudioVisualSpeSeperation: VirtualSources:Source2 -> system:playback_15 checked.
+14:55:55.504 AudioVisualSpeSeperation: AVSS:speaker1 -> Leveler:In1 checked.
+14:55:55.505 AudioVisualSpeSeperation: AVSS:speaker2 -> Leveler:In2 checked.
+14:55:55.505 AudioVisualSpeSeperation: system:capture_7 -> MonitorController:TalkbackIn checked.
+14:55:55.506 AudioVisualSpeSeperation: system:capture_13 -> AVSS:mixed_speech checked.
+14:55:55.506 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InL checked.
+14:55:55.506 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InR checked.
+14:55:55.507 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InL checked.
+14:55:55.507 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InR checked.
+14:55:55.508 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InL checked.
+14:55:55.508 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InR checked.
+14:55:55.508 AudioVisualSpeSeperation: MonitorController:SpeakerL -> system:playback_1 checked.
+14:55:55.509 AudioVisualSpeSeperation: MonitorController:SpeakerR -> system:playback_2 checked.
+14:55:55.509 AudioVisualSpeSeperation: MonitorController:TalkbackOut -> system:playback_15 checked.
+14:55:55.510 AudioVisualSpeSeperation: a2j_bridge:capture -> Leveler:midiIn checked.
+14:55:55.510 AudioVisualSpeSeperation: a2j_bridge:capture -> MonitorController:midiIn checked.
+14:55:55.510 AudioVisualSpeSeperation: a2j_bridge:capture -> VirtualSources:midiIn checked.
+Wed Nov  2 14:55:55 2022: Connecting 'AVSS:speaker1' to 'Leveler:In1'
+Wed Nov  2 14:55:55 2022: Connecting 'AVSS:speaker2' to 'Leveler:In2'
+Wed Nov  2 14:55:55 2022: Connecting 'system:capture_13' to 'AVSS:mixed_speech'
+14:55:57.484 XRUN callback (4).
+14:56:03.709 JACK connection graph change.
+14:56:03.737 JACK active patchbay scan...
+14:56:03.748 AudioVisualSpeSeperation: VirtualSources:Source0 -> system:playback_13 checked.
+14:56:03.757 AudioVisualSpeSeperation: VirtualSources:Source1 -> system:playback_14 checked.
+14:56:03.767 AudioVisualSpeSeperation: VirtualSources:Source2 -> system:playback_15 checked.
+14:56:03.777 AudioVisualSpeSeperation: AVSS:speaker1 -> Leveler:In1 checked.
+14:56:03.787 AudioVisualSpeSeperation: AVSS:speaker2 -> Leveler:In2 checked.
+14:56:03.797 AudioVisualSpeSeperation: system:capture_7 -> MonitorController:TalkbackIn checked.
+14:56:03.806 AudioVisualSpeSeperation: system:capture_13 -> AVSS:mixed_speech checked.
+14:56:03.816 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InL checked.
+14:56:03.826 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InR checked.
+14:56:03.836 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InL checked.
+14:56:03.845 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InR checked.
+14:56:03.855 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InL checked.
+14:56:03.865 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InR checked.
+14:56:03.875 AudioVisualSpeSeperation: MonitorController:SpeakerL -> system:playback_1 checked.
+14:56:03.885 AudioVisualSpeSeperation: MonitorController:SpeakerR -> system:playback_2 checked.
+14:56:03.894 AudioVisualSpeSeperation: MonitorController:TalkbackOut -> system:playback_15 checked.
+14:56:03.904 AudioVisualSpeSeperation: a2j_bridge:capture -> Leveler:midiIn checked.
+14:56:03.914 AudioVisualSpeSeperation: a2j_bridge:capture -> MonitorController:midiIn checked.
+14:56:03.924 AudioVisualSpeSeperation: a2j_bridge:capture -> VirtualSources:midiIn checked.
+14:56:04.024 JACK connection change.
+14:56:04.031 JACK connection graph change.
+14:56:04.031 XRUN callback (5).
+Wed Nov  2 14:56:03 2022: Disconnecting 'system:capture_1' from 'AVSS:mixed_speech'
+Wed Nov  2 14:56:03 2022: Disconnecting 'system:capture_13' from 'AVSS:mixed_speech'
+Wed Nov  2 14:56:03 2022: Disconnecting 'AVSS:speaker1' from 'system:playback_1'
+Wed Nov  2 14:56:03 2022: Disconnecting 'AVSS:speaker1' from 'Leveler:In1'
+Wed Nov  2 14:56:03 2022: Disconnecting 'AVSS:speaker2' from 'system:playback_2'
+Wed Nov  2 14:56:03 2022: Disconnecting 'AVSS:speaker2' from 'Leveler:In2'
+Wed Nov  2 14:56:03 2022: ERROR: JackFreewheelDriver::ProcessSync: SuspendRefNum error
+Wed Nov  2 14:56:03 2022: ERROR: JackAudioDriver::ProcessGraphSync: ProcessWriteSlaves error, engine may now behave abnormally!!
+Wed Nov  2 14:56:03 2022: ERROR: JackPosixProcessSync::LockedTimedWait error usec = 160000 err = Connection timed out
+Wed Nov  2 14:56:03 2022: ERROR: JackEngine::ClientDeactivate wait error ref = 8 name = AVSS
+Wed Nov  2 14:56:03 2022: ERROR: JackEngine::ClientKill ref = 8 cannot be removed from the graph !!
+Wed Nov  2 14:56:03 2022: ERROR: Failed to find port 'AVSS:mixed_speech' to destroy
+Wed Nov  2 14:56:03 2022: ERROR: Failed to find port 'AVSS:speaker1' to destroy
+Wed Nov  2 14:56:03 2022: ERROR: Failed to find port 'AVSS:speaker2' to destroy
+Wed Nov  2 14:56:03 2022: ERROR: JackPosixProcessSync::LockedTimedWait error usec = 32000 err = Connection timed out
+Wed Nov  2 14:56:03 2022: ERROR: JackEngine::ClientCloseAux wait error ref = 8
+Wed Nov  2 14:56:03 2022: Client 'AVSS' with PID 2284106 is out
+Wed Nov  2 14:56:04 2022: ERROR: JackAudioDriver::ProcessGraphSync: SuspendRefNum error, engine may now behave abnormally!!
+14:56:04.233 JACK active patchbay scan...
+14:56:04.234 AudioVisualSpeSeperation: VirtualSources:Source0 -> system:playback_13 checked.
+14:56:04.235 AudioVisualSpeSeperation: VirtualSources:Source1 -> system:playback_14 checked.
+14:56:04.235 AudioVisualSpeSeperation: VirtualSources:Source2 -> system:playback_15 checked.
+14:56:04.236 AudioVisualSpeSeperation: system:capture_7 -> MonitorController:TalkbackIn checked.
+14:56:04.236 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InL checked.
+14:56:04.237 AudioVisualSpeSeperation: Leveler:Out1 -> MonitorController:InR checked.
+14:56:04.237 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InL checked.
+14:56:04.237 AudioVisualSpeSeperation: Leveler:Out2 -> MonitorController:InR checked.
+14:56:04.238 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InL checked.
+14:56:04.238 AudioVisualSpeSeperation: Leveler:Out3 -> MonitorController:InR checked.
+14:56:04.238 AudioVisualSpeSeperation: MonitorController:SpeakerL -> system:playback_1 checked.
+14:56:04.239 AudioVisualSpeSeperation: MonitorController:SpeakerR -> system:playback_2 checked.
+14:56:04.239 AudioVisualSpeSeperation: MonitorController:TalkbackOut -> system:playback_15 checked.
+14:56:04.239 AudioVisualSpeSeperation: a2j_bridge:capture -> Leveler:midiIn checked.
+14:56:04.240 AudioVisualSpeSeperation: a2j_bridge:capture -> MonitorController:midiIn checked.
+14:56:04.240 AudioVisualSpeSeperation: a2j_bridge:capture -> VirtualSources:midiIn checked.
