@@ -16,15 +16,20 @@ client = jack.Client("AVSS")
 event = threading.Event()
 
 global audioQueue
+global videoQueue
 global audioBufferFromThePast
+global videoBufferFromThePast
 audioBufferFromThePast = []
+videoBufferFromThePast= []
 
 class AudioCapture(Process):
-    def __init__(self, audioFrameQueue):
+    def __init__(self, audioFrameQueue, videoFrameQueue):
         super().__init__()
         global audioQueue
+        global videoQueue
 
         audioQueue = audioFrameQueue
+        videoQueue = videoFrameQueue
         # queue2 = queue
         # check if the server has started
         if client.status.server_started:
@@ -105,12 +110,16 @@ class AudioCapture(Process):
         if(len(audioBufferFromThePast) < NUMBER_OF_SEGMENTS):
             # Add to array to keep the past
             audioBufferFromThePast.append(client.inports[0].get_array())
+            videoBufferFromThePast.append(videoQueue.get())
 
             audioBufferFromThePast
 
             print(audioBufferFromThePast)
+            print(videoBufferFromThePast)
 
+            print(videoQueue.qsize())
             print(len(audioBufferFromThePast))
+            print(len(videoBufferFromThePast))
 
             # ML call here
             # Ich rufe aus und gekomme was zurück

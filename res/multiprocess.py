@@ -15,15 +15,15 @@ if __name__ == '__main__':
     audioFrameQueue = Queue()
 
     # sync process 
-    syncProcess = SyncLoop(videoFrameQueue, audioFrameQueue)
-    syncProcess.start()
+    # syncProcess = SyncLoop(videoFrameQueue, audioFrameQueue)
+    # syncProcess.start()
     
     # add VideoCaputure as process
     captureVideo = CaptureVideo(videoFrameQueue, 0)
     captureVideo.start()
     
     # add AudioCaputure as process
-    audioCapture = AudioCapture(audioFrameQueue)
+    audioCapture = AudioCapture(audioFrameQueue, videoFrameQueue)
     audioCapture.start()
 
     
