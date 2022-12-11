@@ -1,7 +1,13 @@
 from multiprocessing import Process
 import cv2
+import numpy as np
 
 FPS = 25
+VIDEO_BUFFER_SIZE = 64
+
+# or make it as a flatted shape?
+videoBufferFromThePast = np.zeros(VIDEO_BUFFER_SIZE)
+
 
 class CaptureVideo(Process):
   def __init__(self, queue, streamID):
@@ -21,7 +27,14 @@ class CaptureVideo(Process):
         ref, frame = cap.read()
 
         # the queue will always be empty because in the sync Process there we get the element
-        self.queue.put(frame)
+        
+        # ein element im buffer ist ein frame
+        videoBufferFromThePast[VIDEO_BUFFER_SIZE-1::] = frame
+        temp = videoBufferFromThePast[1::]
+        videoBufferFromThePast = np.append(temp, np.zeros(1))
+        print(videoBufferFromThePast)
+        self.queue.put(videoBufferFromThePast)
+        
 
         cv2.imshow("Frame", frame)
         

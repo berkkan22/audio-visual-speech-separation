@@ -9,7 +9,8 @@ import numpy as np
 import time
 from multiprocessing import Process
 
-NUMBER_OF_SEGMENTS = 155
+NUMBER_OF_SEGMENTS = 255
+BUFFER_SIZE = 256
 
 client = jack.Client("AVSS")
 
@@ -19,7 +20,7 @@ global audioQueue
 global videoQueue
 global audioBufferFromThePast
 global videoBufferFromThePast
-audioBufferFromThePast = []
+audioBufferFromThePast = np.zeros(NUMBER_OF_SEGMENTS*BUFFER_SIZE)
 videoBufferFromThePast= []
 
 class AudioCapture(Process):
@@ -106,20 +107,26 @@ class AudioCapture(Process):
        
         audioQueue.put(client.inports[0].get_array())
         
+        # buffer wird geflatted gefüllt
+        audioBufferFromThePast[NUMBER_OF_SEGMENTS*BUFFER_SIZE-BUFFER_SIZE::] = client.inports[0].get_array().flatten()
+        temp = audioBufferFromThePast[BUFFER_SIZE::]
+        audioBufferFromThePast = np.append(temp, np.zeros(BUFFER_SIZE))
+        print(audioBufferFromThePast)
         
-        if(len(audioBufferFromThePast) < NUMBER_OF_SEGMENTS):
+        
+        if(len(audioBufferFromThePast) < 1):
             # Add to array to keep the past
-            audioBufferFromThePast.append(client.inports[0].get_array())
-            videoBufferFromThePast.append(videoQueue.get())
+            # audioBufferFromThePast.append(client.inports[0].get_array())
+            # videoBufferFromThePast.append(videoQueue.get())
 
-            audioBufferFromThePast
+            # audioBufferFromThePast
 
             print(audioBufferFromThePast)
             print(videoBufferFromThePast)
 
-            print(videoQueue.qsize())
-            print(len(audioBufferFromThePast))
-            print(len(videoBufferFromThePast))
+            # print(videoQueue.qsize())
+            # print(len(audioBufferFromThePast))
+            # print(len(videoBufferFromThePast))
 
             # ML call here
             # Ich rufe aus und gekomme was zurück
