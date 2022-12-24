@@ -59,10 +59,12 @@ class CaptureVideo(Process):
         self.videoBufferFromThePast = np.append(temp, np.zeros(1))
         print(self.videoBufferFromThePast)
         self.queue.put(self.videoBufferFromThePast)
-        
-        # TODO: try except
-        
-        self.faceMeshDetection(frame)
+                
+        try:
+          # TODO: how to get the frame from the functions
+          self.faceMeshDetection(frame)
+        except:
+          print("FaceMesh could not be detected")
 
         cv2.imshow("Frame", frame)
         
@@ -82,6 +84,7 @@ class CaptureVideo(Process):
     frame = cv2.flip(frame, 1)
     
     # Copy frame to manipulate it
+    # TODO:
     lipFrame = frame.copy()
     faceMeshFrame = frame.copy()
 
@@ -188,6 +191,7 @@ class CaptureVideo(Process):
     
     cropedLips = self.cropLips(frame, minXWithGap, maxXWithGap, minYWithGap, maxYWithGap)
     
+    # TODO:
     cv2.imshow("Lips", frame)
     cv2.imshow("CropedLips", cropedLips)
 
