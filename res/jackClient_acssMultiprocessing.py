@@ -27,7 +27,7 @@ event = threading.Event()
 # global audioQueue
 # global videoQueue
 # global audioBufferFromThePast
-# global videoBufferFromThePast
+global videoBufferFromThePast
 # audioBufferFromThePast = np.zeros(NUMBER_OF_SEGMENTS*BUFFER_SIZE)
 # videoBufferFromThePast = []
 
@@ -51,6 +51,8 @@ class AudioCapture(Process):
         # self.videoBuffer = np.zeros((1, 1))
 
         dnnOutQueue = dnnOutQueueParam
+
+        videoBufferFromThePast = [[0]] * 64  # ? wie groß ist der buffer?
 
         # global audioQueue
         # global videoQueue
@@ -120,6 +122,7 @@ class AudioCapture(Process):
         # TODO: downsample to 16kHz
 
         # fill the audio buffer
+        # ! replace with real audio frame
         audioFrame = [0] * DNN_AUDIO_FRAME_SIZE
         # remove first 128 element and add new element
         audioBufferIn = audioBufferInQueue.get()
@@ -128,6 +131,11 @@ class AudioCapture(Process):
         # add new audio frame to buffer
         audioBufferIn.extend(audioFrame)
         audioBufferInQueue.put(audioBufferIn)
+
+        # fill the video buffer
+        hintererVideoBuffer = videoBufferFromThePast[1:]
+        videoBufferFromThePast = hintererVideoBuffer
+        videoBufferFromThePast.append(videoQueue.get())
 
         # prints the length of the audio buffer once when the DNN is running
         if(isDnnRunning == False):
