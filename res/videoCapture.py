@@ -3,10 +3,7 @@ import cv2
 import mediapipe as mp
 import time
 import numpy as np
-
-FONT = cv2.FONT_HERSHEY_PLAIN
-GAB_BETWEEN_LIP = 20
-
+from global_variables import *
 
 class CaptureVideo(Process):
     def __init__(self, queue, streamID):
@@ -31,12 +28,13 @@ class CaptureVideo(Process):
         self.detectFace0 = 1
 
         # cap = cv2.VideoCapture(self.streamID)
-        cap = cv2.VideoCapture("./video540p.mp4")
+        cap = cv2.VideoCapture("res/video540p.mp4")
 
         # print("VideoCapture: ", cap.isOpened())
 
         while(True):
             # Capture frame-by-frame
+            cap.set(cv2.CAP_PROP_FPS, FPS_RATE)
             ref, frame = cap.read()
             frame = cv2.flip(frame, 1)
 

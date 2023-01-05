@@ -37,7 +37,7 @@ if __name__ == '__main__':
     captureVideo.start()
 
     # add AudioCaputure as process
-    audioCapture = AudioCapture(audioBufferInQueue, videoFrameQueue)
+    audioCapture = AudioCapture(audioBufferInQueue, videoFrameQueue, dnnOutQueue)
     audioCapture.start()
 
     #! Wait for them to finish which will never happen because it is a True loop
