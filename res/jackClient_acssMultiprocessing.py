@@ -116,22 +116,22 @@ class AudioCapture(Process):
         global videoBufferFromThePast
         global audioBufferOut
 
-        global FILTER_STATES_LP_DOWN_SAMPLE
-        global FILTER_STATES_LP_UP_SAMPLE_CHANNEL0
+        # global FILTER_STATES_LP_DOWN_SAMPLE
+        # global FILTER_STATES_LP_UP_SAMPLE_CHANNEL0
 
         assert frames == client.blocksize
 
         # TODO: downsample to 16kHz
-        audioFrameCurrent32kHz = client.inports[0].get_array()
+        audioFrameCurrent32kHz = 1 # client.inports[0].get_array()
 
         # Downsample from 48 kHz to 8 kHz samplerate
         # ATTENTION: Signal must be prefiltered with low pass at Nyquist (< 4 kHz)
-        audioFrameCurrent32kHz, FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(b, a, audioFrameCurrent32kHz, zi=FILTER_STATES_LP_DOWN_SAMPLE)
-        audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
+        # audioFrameCurrent32kHz, FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(b, a, audioFrameCurrent32kHz, zi=FILTER_STATES_LP_DOWN_SAMPLE)
+        # audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
 
         # fill the audio buffer
         # ! replace with real audio frame
-        audioFrame = audioFrameCurrent16kHz
+        audioFrame = audioFrameCurrent32kHz # audioFrameCurrent16kHz
         
         audioBufferIn = audioBufferInQueue.get()
         # remove first 128 element
@@ -170,18 +170,18 @@ class AudioCapture(Process):
             #       str(len(audioBufferOut)))
 
         # get the first 128 samples
-        outputForUpsampling = audioBufferOut[:128]
-        # remove the first 128 samples
-        audioBufferOut = audioBufferOut[128:]
+        # outputForUpsampling = audioBufferOut[:128]
+        # # remove the first 128 samples
+        # audioBufferOut = audioBufferOut[128:]
 
-         # Upsample from 8 kHz 48 kHz
-        dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
-        dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling
-        dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
+        #  # Upsample from 8 kHz 48 kHz
+        # dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
+        # dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling
+        # dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
 
 
         # ! der output ist gleich mein input
-        client.outports[0].get_array()[:] = dataCurrentOut32kHz
+        client.outports[0].get_array()[:] = client.inports[0].get_array() # dataCurrentOut32kHz
 
 
         # ! can be removed if it works
