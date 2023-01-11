@@ -9,6 +9,7 @@ import numpy as np
 import time
 from multiprocessing import Process
 from global_variables import *
+from helperFunctions import *
 
 client = jack.Client("AVSS")
 
@@ -109,79 +110,102 @@ class AudioCapture(Process):
         # code block is reached, or because an exception was raised inside),
         # client.deactivate() and client.close() are called automatically.
 
+
+
     # audio process loop
     @client.set_process_callback
     def process(frames):
+        # 'global' is requiert because we initiliz them in the init function
+        # and because we cant give 'self' in the callback function I work 
+        # with 'global'
         global isDnnRunning
         global videoBufferFromThePast
         global audioBufferOut
 
-        # global FILTER_STATES_LP_DOWN_SAMPLE
+        global FILTER_STATES_LP_DOWN_SAMPLE
         # global FILTER_STATES_LP_UP_SAMPLE_CHANNEL0
+
 
         assert frames == client.blocksize
 
-        # TODO: downsample to 16kHz
-        audioFrameCurrent32kHz = 1 # client.inports[0].get_array()
+        # get the input of the mic
+        audioFrameCurrent32kHz = client.inports[0].get_array()
 
-        # Downsample from 48 kHz to 8 kHz samplerate
+        # Downsample from 32 kHz to 16 kHz samplerate
         # ATTENTION: Signal must be prefiltered with low pass at Nyquist (< 4 kHz)
-        # audioFrameCurrent32kHz, FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(b, a, audioFrameCurrent32kHz, zi=FILTER_STATES_LP_DOWN_SAMPLE)
-        # audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
+        audioFrameCurrent32kHz, FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(b, a, audioFrameCurrent32kHz, zi=FILTER_STATES_LP_DOWN_SAMPLE)
+        audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
 
-        # fill the audio buffer
-        # ! replace with real audio frame
-        audioFrame = audioFrameCurrent32kHz # audioFrameCurrent16kHz
         
-        audioBufferIn = audioBufferInQueue.get()
+        # # get the new audioFrame at 16kHz
+        newAudioFrame = audioFrameCurrent16kHz 
+
+        # get the audioBufferQueue element
+        audioBufferInput = audioBufferInQueue.get()
+
+        # remove the first frame and add the new frame
+        newAudioBuffer = removeFirstFrameAndAddNewFrame(audioBufferInput, newAudioFrame)
+
         # remove first 128 element
-        audioBufferIn = audioBufferIn[int(AUDIO_FRAME_SIZE/DOWN_SAMPLING_FACTOR):]
-        # add new audio frame to buffer
-        audioBufferIn.extend(audioFrame)
-        audioBufferInQueue.put(audioBufferIn)
+        # audioBufferInputModified = audioBufferInput[int(AUDIO_FRAME_SIZE/DOWN_SAMPLING_FACTOR):]
+        # # add new audio frame to buffer
+        # audioBufferInputModified.extend(newAudioFrame)
 
-        # fill the video buffer
-        hintererVideoBuffer = videoBufferFromThePast[1:]
-        videoBufferFromThePast = hintererVideoBuffer
-        videoBufferFromThePast.append(videoQueue.get())
+        # put it again in the queue so it can be used in the DNN process
+        audioBufferInQueue.put(newAudioBuffer)
 
-        # prints the length of the audio buffer once when the DNN is running
-        if(isDnnRunning == False):
-            # print("Lenght of in buffer \t\t" + str(len(self.audioBufferInQueue))) # sollte immer gleich 40800 sein
-            # print("Lenght of the out buffer after filling (start DNN) \t" + str(len(self.audioBufferOut)))
-            # sollte immer gleich 40800 sein
-            # print("qSize of in bufferQueue \t\t\t" + str(audioBufferInQueue.qsize()))
-            # print("qSize of in videoQueue \t\t\t\t" + str(videoQueue.qsize()))
-            # # sollte immer gleich 40800 sein
-            # print("Lenght of the in buffer \t\t" + str(len(audioBufferIn)))
-            # print("Lenght of the out buffer \t\t" + str(len(audioBufferOut)))
-            # print("Length of the videoBufferFromThePast" + str(len(videoBufferFromThePast)))
-            isDnnRunning = True
-
-        # print("DnnModelCall started")
-        if(dnnOutQueue.qsize() > 0):
-            isDnnRunning = False
-            dnnModelResult = dnnOutQueue.get()
-
-            audioBufferOut.extend(dnnModelResult)
+        # output
+        client.outports[0].get_array()[:] = audioFrameCurrent32kHz # client.inports[0].get_array() # dataCurrentOut32kHz
 
 
-            # print("Lenght of the out buffer after filling \t" +
-            #       str(len(audioBufferOut)))
 
-        # get the first 128 samples
-        # outputForUpsampling = audioBufferOut[:128]
-        # # remove the first 128 samples
-        # audioBufferOut = audioBufferOut[128:]
+        # remove first 128 element
+        # audioBufferIn = audioBufferIn[int(AUDIO_FRAME_SIZE/DOWN_SAMPLING_FACTOR):]
+        # # add new audio frame to buffer
+        # audioBufferIn.extend(newAudioFrame)
 
-        #  # Upsample from 8 kHz 48 kHz
-        # dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
-        # dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling
-        # dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
+        # # fill the video buffer
+        # hintererVideoBuffer = videoBufferFromThePast[1:]
+        # videoBufferFromThePast = hintererVideoBuffer
+        # videoBufferFromThePast.append(videoQueue.get())
+
+        # # prints the length of the audio buffer once when the DNN is running
+        # if(isDnnRunning == False):
+        #     # print("Lenght of in buffer \t\t" + str(len(self.audioBufferInQueue))) # sollte immer gleich 40800 sein
+        #     # print("Lenght of the out buffer after filling (start DNN) \t" + str(len(self.audioBufferOut)))
+        #     # sollte immer gleich 40800 sein
+        #     # print("qSize of in bufferQueue \t\t\t" + str(audioBufferInQueue.qsize()))
+        #     # print("qSize of in videoQueue \t\t\t\t" + str(videoQueue.qsize()))
+        #     # # sollte immer gleich 40800 sein
+        #     # print("Lenght of the in buffer \t\t" + str(len(audioBufferIn)))
+        #     # print("Lenght of the out buffer \t\t" + str(len(audioBufferOut)))
+        #     # print("Length of the videoBufferFromThePast" + str(len(videoBufferFromThePast)))
+        #     isDnnRunning = True
+
+        # # print("DnnModelCall started")
+        # if(dnnOutQueue.qsize() > 0):
+        #     isDnnRunning = False
+        #     dnnModelResult = dnnOutQueue.get()
+
+        #     audioBufferOut.extend(dnnModelResult)
+
+
+        #     # print("Lenght of the out buffer after filling \t" +
+        #     #       str(len(audioBufferOut)))
+
+        # # get the first 128 samples
+        # # outputForUpsampling = audioBufferOut[:128]
+        # # # remove the first 128 samples
+        # # audioBufferOut = audioBufferOut[128:]
+
+        # #  # Upsample from 8 kHz 48 kHz
+        # # dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
+        # # dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling
+        # # dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
 
 
         # ! der output ist gleich mein input
-        client.outports[0].get_array()[:] = client.inports[0].get_array() # dataCurrentOut32kHz
+        client.outports[0].get_array()[:] = audioFrameCurrent32kHz # client.inports[0].get_array() # dataCurrentOut32kHz
 
 
         # ! can be removed if it works
@@ -241,3 +265,4 @@ class AudioCapture(Process):
         cv2.destroyAllWindows()
 
         event.set()
+
