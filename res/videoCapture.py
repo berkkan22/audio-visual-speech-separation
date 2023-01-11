@@ -27,8 +27,8 @@ class CaptureVideo(Process):
 
         self.detectFace0 = 1
 
-        # cap = cv2.VideoCapture(self.streamID)
-        cap = cv2.VideoCapture("res/video540p.mp4")
+        cap = cv2.VideoCapture(self.streamID)
+        # cap = cv2.VideoCapture("res/video540p.mp4")
 
         # print("VideoCapture: ", cap.isOpened())
 

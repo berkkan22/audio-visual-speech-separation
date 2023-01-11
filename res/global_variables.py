@@ -35,7 +35,7 @@ AUDIO_BUFFER_IN_SIZE = 40800
 
 # this is the output buffer. The size is also the limitation
 # for the process to be in realtime. For more please read the bachelor thesis at # TODO: chapter of this part
-AUDIO_BUFFER_OUT_SIZE = 1000000
+AUDIO_BUFFER_OUT_SIZE = 10000
 
 
 # video capture device and openCV variables

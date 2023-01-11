@@ -28,9 +28,9 @@ if __name__ == '__main__':
 
     # dnnOutQueue for continous output
     dnnOutQueue = Queue()
-    # dnnModelCall = DnnModelCall(
-    #     dnnOutQueue, videoFrameQueue, audioBufferInQueue)
-    # dnnModelCall.start()
+    dnnModelCall = DnnModelCall(
+        dnnOutQueue, videoFrameQueue, audioBufferInQueue)
+    dnnModelCall.start()
 
     # add VideoCaputure as process
     captureVideo = CaptureVideo(videoFrameQueue, 0)

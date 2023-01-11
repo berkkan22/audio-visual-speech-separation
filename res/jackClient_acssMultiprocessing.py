@@ -21,6 +21,9 @@ global audioBufferInQueue
 global audioBufferOut
 global dnnOutQueue
 
+global count
+count = 0
+
 # global isDnnRunningvideoBufferFromThePast
 isDnnRunning = False
 
@@ -125,6 +128,8 @@ class AudioCapture(Process):
         global FILTER_STATES_LP_DOWN_SAMPLE
         global FILTER_STATES_LP_UP_SAMPLE_CHANNEL0
 
+        global count
+
 
         assert frames == client.blocksize
 
@@ -140,7 +145,7 @@ class AudioCapture(Process):
         # get the new audioFrame at 16kHz
         newAudioFrame = audioFrameCurrent16kHz 
 
-        if(not audioBufferInQueue):
+        if(not audioBufferInQueue.empty()):
             # get the audioBufferQueue element
             audioBufferInput = audioBufferInQueue.get(block=False)
 
@@ -149,15 +154,25 @@ class AudioCapture(Process):
 
             # put it again in the queue so it can be used in the DNN process
             audioBufferInQueue.put(audioBufferInputModified, block=False)
+            # print("audio buffer not empty ")
+            # count += 1
+        else:
+            audioBufferInputModified = removeFirstFrameAndAddNewFrame([], newAudioFrame)
+
+            # put it again in the queue so it can be used in the DNN process
+            audioBufferInQueue.put(audioBufferInputModified, block=False)
+            # print("audio buffer empty ")
+
 
         # fill the video buffer
-        if(not videoQueue):
+        if(not videoQueue.empty()):
             videoBufferFromThePast = videoBufferFromThePast[1:]
             videoBufferFromThePast.append(videoQueue.get(block=False))
+            # print("video buffer ")
 
-        if(not dnnOutQueue):
+        if(not dnnOutQueue.empty()):
             dnnModelResult = dnnOutQueue.get(block=False)
-            print("get")
+            print("dnn result")
             audioBufferOut.extend(dnnModelResult)
 
         # get the first 128 samples
