@@ -22,7 +22,7 @@ global audioBufferOut
 global dnnOutQueue
 
 global count
-count = 0
+count = -1
 
 # global isDnnRunningvideoBufferFromThePast
 isDnnRunning = False
@@ -38,6 +38,12 @@ class AudioCapture(Process):
         global audioBufferOut
         global dnnOutQueue
         global videoBufferFromThePast
+        global audioBufferTestTempBerkkan
+        global dnnModelCallTest
+
+
+
+        audioBufferTestTempBerkkan = [0] * 40800
 
 
         videoQueue = videoQueueParam
@@ -124,12 +130,13 @@ class AudioCapture(Process):
         global isDnnRunning
         global videoBufferFromThePast
         global audioBufferOut
+        global audioBufferTestTempBerkkan
+        global dnnModelCallTest
 
         global FILTER_STATES_LP_DOWN_SAMPLE
         global FILTER_STATES_LP_UP_SAMPLE_CHANNEL0
 
         global count
-
 
         assert frames == client.blocksize
 
@@ -145,23 +152,25 @@ class AudioCapture(Process):
         # get the new audioFrame at 16kHz
         newAudioFrame = audioFrameCurrent16kHz 
 
-        if(not audioBufferInQueue.empty()):
-            # get the audioBufferQueue element
-            audioBufferInput = audioBufferInQueue.get(block=False)
+        if(count > 20):
+            print("triggert " + str(count))
+            # audioBufferInput = audioBufferInQueue.get(block=False) # 40800 aus nullen
 
             # remove the first frame and add the new frame
-            audioBufferInputModified = removeFirstFrameAndAddNewFrame(audioBufferInput, newAudioFrame)
+            # audioBufferInputModified = removeFirstFrameAndAddNewFrame(audioBufferInput, newAudioFrame)
 
             # put it again in the queue so it can be used in the DNN process
-            audioBufferInQueue.put(audioBufferInputModified, block=False)
-            # print("audio buffer not empty ")
-            # count += 1
+            audioBufferInQueue.put(audioBufferTestTempBerkkan, block=False)
+
+            count = 0
+
+            # audioBufferInQueue.get()
+
         else:
-            audioBufferInputModified = removeFirstFrameAndAddNewFrame([], newAudioFrame)
+            # print("count: " + str(count))
 
-            # put it again in the queue so it can be used in the DNN process
-            audioBufferInQueue.put(audioBufferInputModified, block=False)
-            # print("audio buffer empty ")
+            audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
+            count += 1
 
 
         # fill the video buffer
@@ -171,9 +180,11 @@ class AudioCapture(Process):
             # print("video buffer ")
 
         if(not dnnOutQueue.empty()):
+            print("audioBufferOut before extend length: \t\t\t" + str(len(audioBufferOut)))
+
             dnnModelResult = dnnOutQueue.get(block=False)
-            print("dnn result")
             audioBufferOut.extend(dnnModelResult)
+            print("audioBufferOut after extend length: \t" + str(len(audioBufferOut)))
 
         # get the first 128 samples
         outputForUpsampling = audioBufferOut[:128]
@@ -194,52 +205,6 @@ class AudioCapture(Process):
         # output
         client.outports[0].get_array()[:] = dataCurrentOut32kHz # client.inports[0].get_array() # dataCurrentOut32kHz
 
-
-        # ! can be removed if it works
-        # assert len(client.inports) == len(client.outports)
-        # assert frames == client.blocksize
-        # for i, o in zip(client.inports, client.outports):
-        #     o.get_array()[:] = i.get_buffer()
-
-        # dataCurrent48kHz = client.inports[0].get_array()
-        # print(dataCurrent48kHz)
-
-        # ! der output ist gleich mein input
-        # client.outports[0].get_array()[:] = client.inports[0].get_array()
-
-        # audioQueue.put(client.inports[0].get_array())
-
-        # buffer wird geflatted gefüllt
-        # audioBufferFromThePast[NUMBER_OF_SEGMENTS*BUFFER_SIZE -
-        #                        BUFFER_SIZE::] = client.inports[0].get_array().flatten()
-        # temp = audioBufferFromThePast[BUFFER_SIZE::]
-        # audioBufferFromThePast = np.append(temp, np.zeros(BUFFER_SIZE))
-        # print(audioBufferFromThePast)
-
-        # if(len(audioBufferFromThePast) < 1):
-        # Add to array to keep the past
-        # audioBufferFromThePast.append(client.inports[0].get_array())
-        # videoBufferFromThePast.append(videoQueue.get())
-
-        # audioBufferFromThePast
-
-        # print(audioBufferFromThePast)
-        # print(videoBufferFromThePast)
-
-        # print(videoQueue.qsize())
-        # print(len(audioBufferFromThePast))
-        # print(len(videoBufferFromThePast))
-
-        # ML call here
-        # Ich rufe aus und gekomme was zurück
-        # Wenn das zurückgegebene nicht leer ist
-        # setze den output auf das zurückgegebene
-        # Oder aufruf mit processen machen das die
-        # aufrufe parallel laufen können? aber dann
-        # kann es überlastet werden, weil zu viel
-        # threads/process laufen
-
-        # client.outports[0].get_array()[:] = dataCurrent48kHz
 
     @client.set_shutdown_callback
     def shutdown(status, reason):
