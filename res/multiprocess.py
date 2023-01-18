@@ -32,13 +32,16 @@ if __name__ == '__main__':
         dnnOutQueue, videoFrameQueue, audioBufferInQueue)
     dnnModelCall.start()
 
+
     # # add VideoCaputure as process
     captureVideo = CaptureVideo(videoFrameQueue, 0)
     captureVideo.start()
 
+
+
     # add AudioCaputure as process
     audioCapture = AudioCapture(audioBufferInQueue, videoFrameQueue, dnnOutQueue)
-    # audioCapture.start()
+    audioCapture.start()
 
     #! Wait for them to finish which will never happen because it is a True loop
     # syncProcess.join()

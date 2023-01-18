@@ -65,6 +65,8 @@ class AudioCapture(Process):
         # audioQueue = audioFrameQueue
         # videoQueue = videoFrameQueue
         # queue2 = queue
+
+    def run(self):
         # check if the server has started
         if client.status.server_started:
             print("JACK server started")
@@ -147,7 +149,7 @@ class AudioCapture(Process):
         # get the new audioFrame at 16kHz
         newAudioFrame = audioFrameCurrent16kHz 
 
-        if(count > 20):
+        # if(count > 20):
             # print("triggert " + str(count))
             # audioBufferInput = audioBufferInQueue.get(block=False) # 40800 aus nullen
 
@@ -155,17 +157,21 @@ class AudioCapture(Process):
             # audioBufferInputModified = removeFirstFrameAndAddNewFrame(audioBufferInput, newAudioFrame)
 
             # put it again in the queue so it can be used in the DNN process
-            audioBufferInQueue.put(audioBufferTestTempBerkkan, block=False)
 
-            count = 0
+       	    #  audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
 
-            # audioBufferInQueue.get()
+        audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
+        audioBufferInQueue.put(audioBufferTestTempBerkkan, block=False)
 
-        else:
-            # print("count: " + str(count))
+            # count = 0
 
-            audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
-            count += 1
+        #     # audioBufferInQueue.get()
+
+        # else:
+        #     # print("count: " + str(count))
+
+            # audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
+            # count += 1
 
 
         # fill the video buffer
