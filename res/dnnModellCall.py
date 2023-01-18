@@ -15,8 +15,9 @@ class DnnModelCall(Process):
         while True:
             if(not self.audioBuffer.empty()):
                 k = 0
-                audioBufferIn = self.audioBuffer.get()
-                # self.audioBuffer.put(audioBufferIn, block=False)
+                # audioBufferIn = self.audioBuffer.get()
+                audioBufferIn = self.audioBuffer.get(block=False)
+                self.audioBuffer.put(audioBufferIn, block=False)
                 # print("\n**************************************************")
                 # print("********** Start DNN Model Process here **********")
                 # print("**************************************************\n")
