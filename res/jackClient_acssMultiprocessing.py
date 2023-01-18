@@ -149,7 +149,7 @@ class AudioCapture(Process):
         # get the new audioFrame at 16kHz
         newAudioFrame = audioFrameCurrent16kHz 
 
-        # if(count > 20):
+        if(count > 20):
             # print("triggert " + str(count))
             # audioBufferInput = audioBufferInQueue.get(block=False) # 40800 aus nullen
 
@@ -160,18 +160,17 @@ class AudioCapture(Process):
 
        	    #  audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
 
-        audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
-        audioBufferInQueue.put(audioBufferTestTempBerkkan, block=False)
+            audioBufferInQueue.put(audioBufferTestTempBerkkan, block=False)
 
-            # count = 0
+            count = 0
 
         #     # audioBufferInQueue.get()
 
-        # else:
+        else:
         #     # print("count: " + str(count))
 
-            # audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
-            # count += 1
+            audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
+            count += 1
 
 
         # fill the video buffer
