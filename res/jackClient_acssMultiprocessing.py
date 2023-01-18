@@ -15,7 +15,6 @@ client = jack.Client("AVSS")
 
 event = threading.Event()
 
-# global videoBufferFromThePast
 global videoQueue
 global audioBufferInQueue
 global audioBufferOut
@@ -23,9 +22,6 @@ global dnnOutQueue
 
 global count
 count = -1
-
-# global isDnnRunningvideoBufferFromThePast
-isDnnRunning = False
 
 class AudioCapture(Process):
     def __init__(self, audioBufferInQueueParam, videoQueueParam, dnnOutQueueParam):
@@ -42,29 +38,16 @@ class AudioCapture(Process):
         global dnnModelCallTest
 
 
-
         audioBufferTestTempBerkkan = [0] * 40800
-
-
-        videoQueue = videoQueueParam
-
         audioBufferOut = [0] * AUDIO_BUFFER_OUT_SIZE
         audioBufferInQueue = audioBufferInQueueParam
 
-        # self.videoBuffer = np.zeros((1, 1))
-
         dnnOutQueue = dnnOutQueueParam
 
+        videoQueue = videoQueueParam
         videoFrameSize = np.zeros((FRAME_HEIGHT, FRAME_WIDHT, FRAME_CHANNELS), np.uint8)
         videoBufferFromThePast = [[0]] * 64  # ? wie groß ist der buffer?
-        # print(len(videoBufferFromThePast))
 
-        # global audioQueue
-        # global videoQueue
-
-        # audioQueue = audioFrameQueue
-        # videoQueue = videoFrameQueue
-        # queue2 = queue
 
     def run(self):
         # check if the server has started
@@ -108,7 +91,6 @@ class AudioCapture(Process):
             print("Press Ctrl+C to stop")
             try:
                 event.wait()
-                # print("TEST")
             except KeyboardInterrupt:
                 print("\nInterrupted by user")
 
@@ -124,7 +106,6 @@ class AudioCapture(Process):
         # 'global' is requiert because we initiliz them in the init function
         # and because we cant give 'self' in the callback function I work 
         # with 'global'
-        global isDnnRunning
         global videoBufferFromThePast
         global audioBufferOut
         global audioBufferTestTempBerkkan
@@ -150,25 +131,10 @@ class AudioCapture(Process):
         newAudioFrame = audioFrameCurrent16kHz 
 
         if(count > 20):
-            # print("triggert " + str(count))
-            # audioBufferInput = audioBufferInQueue.get(block=False) # 40800 aus nullen
-
-            # remove the first frame and add the new frame
-            # audioBufferInputModified = removeFirstFrameAndAddNewFrame(audioBufferInput, newAudioFrame)
-
-            # put it again in the queue so it can be used in the DNN process
-
-       	    #  audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
-
             audioBufferInQueue.put(audioBufferTestTempBerkkan, block=False)
 
             count = 0
-
-        #     # audioBufferInQueue.get()
-
         else:
-        #     # print("count: " + str(count))
-
             audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
             count += 1
 
@@ -188,12 +154,10 @@ class AudioCapture(Process):
 
         # get the first 128 samples
         outputForUpsampling = audioBufferOut[:128]
-        # print("OUTUP " + str(len(outputForUpsampling)))
 
         # remove the first 128 samples
         audioBufferOut = audioBufferOut[128:]
 
-        # print("AUDIOBUFFER " + str(len(audioBufferOut)))
 
          # Upsample from 8 kHz 48 kHz
         dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
