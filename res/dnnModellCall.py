@@ -15,9 +15,9 @@ class DnnModelCall(Process):
         while True:
             if(not self.audioBuffer.empty()):
                 k = 0
-                # audioBufferIn = self.audioBuffer.get()
+                # audioBufferIn = [0] * 3000 # self.audioBuffer.get()
                 audioBufferIn = self.audioBuffer.get(block=False)
-                self.audioBuffer.put(audioBufferIn, block=False)
+                # self.audioBuffer.put(audioBufferIn, block=False)
                 # print("\n**************************************************")
                 # print("********** Start DNN Model Process here **********")
                 # print("**************************************************\n")
@@ -29,5 +29,5 @@ class DnnModelCall(Process):
                 outputDnnHintererTeil = audioBufferIn[-2560:]
                 outputQueue = [] # self.queue.get(block=False)
                 outputQueue.extend(outputDnnHintererTeil)
-                self.queue.put(outputQueue)
+                # self.queue.put(outputQueue)
                 # print("Calculation done")
