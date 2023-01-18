@@ -71,11 +71,6 @@ class AudioCapture(Process):
         if client.status.name_not_unique:
             print("unique name {0!r} assigned".format(client.name))
 
-        # cap = cv2.VideoCapture(0)
-        # global testBool
-        # testBool = True
-        # index = 0
-
         # create port for the input speech ("mixed_speech") and the both speaker
         client.inports.register("mixed_speech")
         client.outports.register("speaker1")
@@ -153,7 +148,7 @@ class AudioCapture(Process):
         newAudioFrame = audioFrameCurrent16kHz 
 
         if(count > 20):
-            print("triggert " + str(count))
+            # print("triggert " + str(count))
             # audioBufferInput = audioBufferInQueue.get(block=False) # 40800 aus nullen
 
             # remove the first frame and add the new frame
@@ -180,11 +175,11 @@ class AudioCapture(Process):
             # print("video buffer ")
 
         if(not dnnOutQueue.empty()):
-            print("audioBufferOut before extend length: \t\t\t" + str(len(audioBufferOut)))
+            # print("audioBufferOut before extend length: \t\t\t" + str(len(audioBufferOut)))
 
             dnnModelResult = dnnOutQueue.get(block=False)
             audioBufferOut.extend(dnnModelResult)
-            print("audioBufferOut after extend length: \t" + str(len(audioBufferOut)))
+            # print("audioBufferOut after extend length: \t" + str(len(audioBufferOut)))
 
         # get the first 128 samples
         outputForUpsampling = audioBufferOut[:128]
