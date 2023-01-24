@@ -10,6 +10,8 @@ import time
 from multiprocessing import Process
 from global_variables import *
 from helperFunctions import *
+import librosa
+
 
 client = jack.Client("AVSS")
 
@@ -19,12 +21,14 @@ global videoQueue
 global audioBufferInQueue
 global audioBufferOut
 global dnnOutQueue
+global triggerQueue
+
 
 global count
 count = -1
 
 class AudioCapture(Process):
-    def __init__(self, audioBufferInQueueParam, videoQueueParam, dnnOutQueueParam):
+    def __init__(self, audioBufferInQueueParam, videoQueueParam, dnnOutQueueParam, triggerQueueParam):
         super().__init__()
         print("AudioCapture: init")
 
@@ -36,9 +40,12 @@ class AudioCapture(Process):
         global videoBufferFromThePast
         global audioBufferTestTempBerkkan
         global dnnModelCallTest
+        global triggerQueue
+
+        triggerQueue = triggerQueueParam
 
 
-        audioBufferTestTempBerkkan = [0] * 40800
+        audioBufferTestTempBerkkan = [0] * (40800 // 8)
         audioBufferOut = [0] * AUDIO_BUFFER_OUT_SIZE
         audioBufferInQueue = audioBufferInQueueParam
 
@@ -50,16 +57,40 @@ class AudioCapture(Process):
 
 
     def run(self):
+        global soundPos
+        global soundFile
+        global spkGainAbs
+        global playActive
+
         # check if the server has started
         if client.status.server_started:
             print("JACK server started")
         if client.status.name_not_unique:
             print("unique name {0!r} assigned".format(client.name))
 
+        samplerate = 48000 #TODO use JACK sample rate
+
+        # bash -c 'cd ~/anaconda3/bin;source activate base; python /export/scratch/studio/StudioScripts/Resources/jack-clients/jackClient_multiAudioPlayer.py /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav -80 /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Male01.wav -80 /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/Noise_Factory.wav -80 2400 500'
+        audioPath = "/export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav" 
+
+        #Changing to 32000 for the current settings
+        soundFile = []
+        TMP_samplerate = 32000
+        sample_48k = librosa.load(audioPath, sr=samplerate)[0]
+        sample = librosa.resample(sample_48k, orig_sr=samplerate, target_sr=TMP_samplerate)
+        print(f'{sample.shape=}')
+        soundFile.append(sample)
+
+        soundPos = np.zeros(1, dtype="int32")
+        playActive = np.ones(1, dtype=bool)
+        spkGainAbs = np.ones(1)
+
+
         # create port for the input speech ("mixed_speech") and the both speaker
         client.inports.register("mixed_speech")
         client.outports.register("speaker1")
         client.outports.register("speaker2")
+        client.outports.register("virtualSource1")
 
         with client:
             # When entering this with-statement, client.activate() is called.
@@ -110,19 +141,35 @@ class AudioCapture(Process):
         global audioBufferOut
         global audioBufferTestTempBerkkan
         global dnnModelCallTest
+        global triggerQueue
 
         global FILTER_STATES_LP_DOWN_SAMPLE
         global FILTER_STATES_LP_UP_SAMPLE_CHANNEL0
 
         global count
+        global soundPos
+        global soundFile
+        global spkGainAbs
+        global playActive
 
         assert frames == client.blocksize
 
-        # get the input of the mic
-        audioFrameCurrent32kHz = client.inports[0].get_array()
+        # virtualSoruces
+        if soundPos[0]+client.blocksize > soundFile[0].size:
+            soundPos[0] = 0
+        virtaulSource = soundFile[0][soundPos[0]:soundPos[0]+client.blocksize] * 0.5 #* spkGainAbs[0] * playActive[0]
+        # print(f'{len(audioFrameCurrent32kHz)}')
+        soundPos[0] += client.blocksize #* playActive[0]
 
-        # Downsample from 32 kHz to 16 kHz samplerate
-        # ATTENTION: Signal must be prefiltered with low pass at Nyquist (< 4 kHz)
+        client.outports[2].get_array()[:] = virtaulSource
+
+
+
+        # get the input of the mic
+        audioFrameCurrent32kHz = client.inports[0].get_array()[:]
+
+        # # Downsample from 32 kHz to 16 kHz samplerate
+        # # ATTENTION: Signal must be prefiltered with low pass at Nyquist (< 4 kHz)
         audioFrameCurrent32kHz, FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(b, a, audioFrameCurrent32kHz, zi=FILTER_STATES_LP_DOWN_SAMPLE)
         audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
 
@@ -130,10 +177,11 @@ class AudioCapture(Process):
         # get the new audioFrame at 16kHz
         newAudioFrame = audioFrameCurrent16kHz 
 
-        if(count > 20):
-            audioBufferInQueue.put(audioBufferTestTempBerkkan, block=False)
+        if(count == 19):
+            audioBufferInQueue.put(audioBufferTestTempBerkkan)
+            # triggerQueue.put(True)
 
-            count = 0
+            # count = 0
         else:
             audioBufferTestTempBerkkan = removeFirstFrameAndAddNewFrame(audioBufferTestTempBerkkan, newAudioFrame)
             count += 1
@@ -142,13 +190,13 @@ class AudioCapture(Process):
         # fill the video buffer
         if(not videoQueue.empty()):
             videoBufferFromThePast = videoBufferFromThePast[1:]
-            videoBufferFromThePast.append(videoQueue.get(block=False))
+            videoBufferFromThePast.append(videoQueue.get())
             # print("video buffer ")
 
         if(not dnnOutQueue.empty()):
             # print("audioBufferOut before extend length: \t\t\t" + str(len(audioBufferOut)))
 
-            dnnModelResult = dnnOutQueue.get(block=False)
+            dnnModelResult = dnnOutQueue.get()
             audioBufferOut.extend(dnnModelResult)
             # print("audioBufferOut after extend length: \t" + str(len(audioBufferOut)))
 
@@ -157,6 +205,8 @@ class AudioCapture(Process):
 
         # remove the first 128 samples
         audioBufferOut = audioBufferOut[128:]
+
+        print(f'audioBufferOut: {len(audioBufferOut)}, count: {count}')
 
 
          # Upsample from 8 kHz 48 kHz

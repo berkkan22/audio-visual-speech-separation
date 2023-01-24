@@ -26,10 +26,13 @@ if __name__ == '__main__':
     # fill the audioBufferInQueue with 0
     # audioBufferInQueue.put([0] * 40800)  # numpy geht nicht weil zu groß
 
+    trigger = Queue()
+
+
     # dnnOutQueue for continous output
     dnnOutQueue = Queue()
     dnnModelCall = DnnModelCall(
-        dnnOutQueue, videoFrameQueue, audioBufferInQueue)
+        dnnOutQueue, videoFrameQueue, audioBufferInQueue, trigger)
     dnnModelCall.start()
 
 
@@ -40,10 +43,10 @@ if __name__ == '__main__':
 
 
     # add AudioCaputure as process
-    audioCapture = AudioCapture(audioBufferInQueue, videoFrameQueue, dnnOutQueue)
+    audioCapture = AudioCapture(audioBufferInQueue, videoFrameQueue, dnnOutQueue, trigger)
     audioCapture.start()
 
     #! Wait for them to finish which will never happen because it is a True loop
-    # syncProcess.join()
-    # captureVideo.join()
-    # audioCapture.join()
+    dnnModelCall.join()
+    captureVideo.join()
+    audioCapture.join()
