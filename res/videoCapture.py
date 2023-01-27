@@ -1,5 +1,6 @@
 from multiprocessing import Process
 import cv2
+import acapture
 import mediapipe as mp
 import time
 import numpy as np
@@ -27,15 +28,17 @@ class CaptureVideo(Process):
 
         self.detectFace0 = 1
 
-        cap = cv2.VideoCapture(self.streamID)
+        # cap = cv2.VideoCapture(self.streamID)
         # cap = cv2.VideoCapture("res/video540p.mp4")
+        cap = acapture.open(self.streamID) # , acapture.CAP_FFMPEG, 0)
 
         # print("VideoCapture: ", cap.isOpened())
 
         while(True):
             # Capture frame-by-frame
-            cap.set(cv2.CAP_PROP_FPS, FPS_RATE)
+            # cap.set(cv2.CAP_PROP_FPS, FPS_RATE)
             ref, frame = cap.read()
+            frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
             frame = cv2.flip(frame, 1)
 
             height = frame.shape[0]
