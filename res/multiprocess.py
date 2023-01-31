@@ -31,14 +31,14 @@ if __name__ == '__main__':
 
     # dnnOutQueue for continous output
     dnnOutQueue = Queue()
-    dnnModelCall = DnnModelCall(
-        dnnOutQueue, videoFrameQueue, audioBufferInQueue, trigger)
-    dnnModelCall.start()
+    # dnnModelCall = DnnModelCall(
+    #     dnnOutQueue, videoFrameQueue, audioBufferInQueue, trigger)
+    # dnnModelCall.start()
 
 
     # # add VideoCaputure as process
-    captureVideo = CaptureVideo(videoFrameQueue, 0)
-    captureVideo.start()
+    # captureVideo = CaptureVideo(videoFrameQueue, 0)
+    # captureVideo.start()
 
 
 
@@ -47,6 +47,6 @@ if __name__ == '__main__':
     audioCapture.start()
 
     #! Wait for them to finish which will never happen because it is a True loop
-    dnnModelCall.join()
-    captureVideo.join()
+    # dnnModelCall.join()
+    # captureVideo.join()
     audioCapture.join()
