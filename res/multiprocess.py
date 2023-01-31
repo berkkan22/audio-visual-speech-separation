@@ -7,6 +7,7 @@ from videoCapture import CaptureVideo
 import jack
 import numpy
 from dnnModellCall import DnnModelCall
+from audioCapture import AudioCaptureNew
 
 
 if __name__ == '__main__':
@@ -31,9 +32,9 @@ if __name__ == '__main__':
 
     # dnnOutQueue for continous output
     dnnOutQueue = Queue()
-    # dnnModelCall = DnnModelCall(
-    #     dnnOutQueue, videoFrameQueue, audioBufferInQueue, trigger)
-    # dnnModelCall.start()
+    dnnModelCall = DnnModelCall(
+        dnnOutQueue, videoFrameQueue, audioBufferInQueue, trigger)
+    dnnModelCall.start()
 
 
     # # add VideoCaputure as process
@@ -43,10 +44,10 @@ if __name__ == '__main__':
 
 
     # add AudioCaputure as process
-    audioCapture = AudioCapture(audioBufferInQueue, videoFrameQueue, dnnOutQueue, trigger)
+    audioCapture = AudioCaptureNew(audioBufferInQueue) # AudioCapture(audioBufferInQueue, videoFrameQueue, dnnOutQueue)
     audioCapture.start()
-
+    
     #! Wait for them to finish which will never happen because it is a True loop
-    # dnnModelCall.join()
+    dnnModelCall.join()
     # captureVideo.join()
     audioCapture.join()
