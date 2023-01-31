@@ -32,5 +32,5 @@ class DnnModelCall(Process):
                 self.queue.put(outputDnnHintererTeil)
                 # print("Calculation done")
 
-            if 40800
+            # if 40800
                 

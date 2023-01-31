@@ -68,7 +68,7 @@ class CaptureVideo(Process):
                 print("Change Camera to face " + str(self.detectFace0))
                 self.detectFace0 = 0 if self.detectFace0 == 1 else 1
 
-        cap.release()
+        # cap.release()
         cv2.destroyAllWindows()
 
     def faceMeshDetection(self, frame):

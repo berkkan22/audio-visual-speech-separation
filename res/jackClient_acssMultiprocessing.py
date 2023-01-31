@@ -71,7 +71,7 @@ class AudioCapture(Process):
         samplerate = 48000 #TODO use JACK sample rate
 
         # bash -c 'cd ~/anaconda3/bin;source activate base; python /export/scratch/studio/StudioScripts/Resources/jack-clients/jackClient_multiAudioPlayer.py /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav -80 /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Male01.wav -80 /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/Noise_Factory.wav -80 2400 500'
-        audioPath = "/export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav" 
+        audioPath = r'resources\misc\gerkmannFrintrop.wav' # "/export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav" 
 
         #Changing to 32000 for the current settings
         soundFile = []
