@@ -22,3 +22,12 @@ def removeFirstFrameAndAddNewFrame(audioBuffer, newAudioFrame):
     audioBuffer.extend(newAudioFrame)
 
     return audioBuffer
+
+def virtaulSources(soundFile, soundPos, client, spkGainAbs, playActive):
+    if soundPos[0]+client.blocksize > soundFile[0].size:
+        soundPos[0] = 0
+    virtaulSource = soundFile[0][soundPos[0]:soundPos[0]+client.blocksize] * 0.5 #* spkGainAbs[0] * playActive[0]
+    # print(f'{len(audioFrameCurrent32kHz)}')
+    soundPos[0] += client.blocksize #* playActive[0]
+    
+    return virtaulSource
