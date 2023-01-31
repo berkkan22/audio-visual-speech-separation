@@ -89,8 +89,8 @@ class AudioCapture(Process):
         # create port for the input speech ("mixed_speech") and the both speaker
         client.inports.register("mixed_speech")
         client.outports.register("speaker1")
-        client.outports.register("speaker2")
-        client.outports.register("virtualSource1")
+        # client.outports.register("speaker2") #! need to be removed i guess because I have not so many ouput ports
+        client.outports.register("virtualSource")
 
         with client:
             # When entering this with-statement, client.activate() is called.
@@ -161,7 +161,8 @@ class AudioCapture(Process):
         # print(f'{len(audioFrameCurrent32kHz)}')
         soundPos[0] += client.blocksize #* playActive[0]
 
-        client.outports[2].get_array()[:] = virtaulSource
+        # client.outports[2].get_array()[:] = virtaulSource
+        client.outports[1].get_array()[:] = virtaulSource
 
 
 
@@ -170,12 +171,12 @@ class AudioCapture(Process):
 
         # # # Downsample from 32 kHz to 16 kHz samplerate
         # # # ATTENTION: Signal must be prefiltered with low pass at Nyquist (< 4 kHz)
-        # audioFrameCurrent32kHz, FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(b, a, audioFrameCurrent32kHz, zi=FILTER_STATES_LP_DOWN_SAMPLE)
-        # audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
+        audioFrameCurrent32kHz, FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(b, a, audioFrameCurrent32kHz, zi=FILTER_STATES_LP_DOWN_SAMPLE)
+        audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
 
         
-        # # get the new audioFrame at 16kHz
-        # newAudioFrame = audioFrameCurrent16kHz 
+        # get the new audioFrame at 16kHz
+        newAudioFrame = audioFrameCurrent16kHz 
 
         # if(count == 19):
         #     audioBufferInQueue.put(audioBufferTestTempBerkkan)
@@ -209,15 +210,15 @@ class AudioCapture(Process):
         # print(f'audioBufferOut: {len(audioBufferOut)}, count: {count}')
 
 
-        #  # Upsample from 8 kHz 48 kHz
-        # dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
-        # # print("data: " + str(dataCurrentOut32kHz.shape))
-        # dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling
-        # dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
+         # Upsample from 8 kHz 48 kHz
+        dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
+        # print("data: " + str(dataCurrentOut32kHz.shape))
+        dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = newAudioFrame # outputForUpsampling
+        dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
 
 
         # output
-        client.outports[0].get_array()[:] = audioFrameCurrent32kHz # client.inports[0].get_array() # dataCurrentOut32kHz # client.inports[0].get_array() # dataCurrentOut32kHz
+        client.outports[0].get_array()[:] = dataCurrentOut32kHz # audioFrameCurrent32kHz # client.inports[0].get_array() # dataCurrentOut32kHz # client.inports[0].get_array() # dataCurrentOut32kHz
 
 
     @client.set_shutdown_callback
