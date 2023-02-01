@@ -48,8 +48,8 @@ FRAME_CHANNELS = 3
 
 from multiprocessing import Queue
 
-audioBufferInQueue = Queue()
-dnnOutQueue = Queue()
+# audioBufferInQueue = Queue()
+# dnnOutQueue = Queue()
 videoFrameQueue = Queue()
 trigger = Queue()
 

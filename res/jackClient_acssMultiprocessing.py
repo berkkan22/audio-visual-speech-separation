@@ -7,7 +7,7 @@ import cv2
 # import capVideo
 import numpy as np
 import time
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 from global_variables import *
 from helperFunctions import *
 import librosa
@@ -17,51 +17,73 @@ client = jack.Client("AVSS")
 
 event = threading.Event()
 
-global videoQueue
+# global videoQueue
+# global audioBufferInQueue
+# global audioBufferOut
+# global dnnOutQueue
+# global triggerQueue
+
+
+# global count
+# count = -1
+
+
+# class GlobalTest():
+#     # def __init__(self):
+#     #     self.count = -1
+#     #     self.audioBufferInQueue = Queue()
+        
+#     def setCount(self, count):
+#         self.count = count
+    
+#     def getCount(self):
+#         return self.count
+    
+#     def setAudioBufferInQueue(self, audioBufferInQueue):
+#         self.audioBufferInQueue = audioBufferInQueue
+    
+#     def getAudioBufferInQueue(self):
+#         return self.audioBufferInQueue
+    
+# globalTest = GlobalTest()
+# globalTest.setCount(-1)
+# globalTest.setAudioBufferInQueue(Queue())
+
 global audioBufferInQueue
-global audioBufferOut
-global dnnOutQueue
-global triggerQueue
-
-
-global count
-count = -1
+# audioBufferInQueue = None
 
 class AudioCapture(Process):
-    def __init__(self, audioBufferInQueueParam, videoQueueParam, dnnOutQueueParam, triggerQueueParam):
+    def __init__(self, audioBufferInQueueParam, videoQueueParam, dnnOutQueueParam):
         super().__init__()
         print("AudioCapture: init")
-
-
-        global videoQueue
+        
+        # global audioBufferTestTempBerkkan
+        # global audioBufferOut
         global audioBufferInQueue
-        global audioBufferOut
-        global dnnOutQueue
-        global videoBufferFromThePast
-        global audioBufferTestTempBerkkan
-        global dnnModelCallTest
-        global triggerQueue
-
-        triggerQueue = triggerQueueParam
+        
+        # global dnnOutQueue
+        
+        # global videoQueue
+        # global videoBufferFromThePast
 
 
         audioBufferTestTempBerkkan = [0] * (40800 // 8)
         audioBufferOut = [0] * AUDIO_BUFFER_OUT_SIZE
         audioBufferInQueue = audioBufferInQueueParam
+        # globalTest.setAudioBufferInQueue(audioBufferInQueueParam)
 
         dnnOutQueue = dnnOutQueueParam
 
         videoQueue = videoQueueParam
-        videoFrameSize = np.zeros((FRAME_HEIGHT, FRAME_WIDHT, FRAME_CHANNELS), np.uint8)
         videoBufferFromThePast = [[0]] * 64  # ? wie groß ist der buffer?
-
+        # videoFrameSize = np.zeros((FRAME_HEIGHT, FRAME_WIDHT, FRAME_CHANNELS), np.uint8)
 
     def run(self):
         global soundPos
         global soundFile
         global spkGainAbs
         global playActive
-
+        
         # check if the server has started
         if client.status.server_started:
             print("JACK server started")
@@ -134,34 +156,41 @@ class AudioCapture(Process):
     # audio process loop
     @client.set_process_callback
     def process(frames):
+        
         # 'global' is requiert because we initiliz them in the init function
         # and because we cant give 'self' in the callback function I work 
         # with 'global'
-        global videoBufferFromThePast
-        global audioBufferOut
-        global audioBufferTestTempBerkkan
-        global dnnModelCallTest
-        global triggerQueue
-
+        # global audioBufferTestTempBerkkan
+        # global audioBufferOut
+        # global videoBufferFromThePast
+        # global dnnOutQueue
+        # global dnnModelCallTest
+        # global triggerQueue
+        # global audioBufferInQueue
+        
+        # audioBuffer = globalTest.getAudioBufferInQueue()
+    
         global FILTER_STATES_LP_DOWN_SAMPLE
         global FILTER_STATES_LP_UP_SAMPLE_CHANNEL0
 
-        global count
+        # global count
         global soundPos
-        global soundFile
-        global spkGainAbs
-        global playActive
+        # global soundFile
+        # global spkGainAbs
+        # global playActive
 
         assert frames == client.blocksize
 
         # virtualSoruces
-        if soundPos[0]+client.blocksize > soundFile[0].size:
-            soundPos[0] = 0
-        virtaulSource = soundFile[0][soundPos[0]:soundPos[0]+client.blocksize] * 0.5 #* spkGainAbs[0] * playActive[0]
-        # print(f'{len(audioFrameCurrent32kHz)}')
-        soundPos[0] += client.blocksize #* playActive[0]
+        # if soundPos[0]+client.blocksize > soundFile[0].size:
+        #     soundPos[0] = 0
+        # virtaulSource = soundFile[0][soundPos[0]:soundPos[0]+client.blocksize] * 0.5 #* spkGainAbs[0] * playActive[0]
+        # # print(f'{len(audioFrameCurrent32kHz)}')
+        # soundPos[0] += client.blocksize #* playActive[0]
 
         # client.outports[2].get_array()[:] = virtaulSource
+        virtaulSource = virtaulSources(soundFile, soundPos, client, spkGainAbs, playActive)
+        
         client.outports[1].get_array()[:] = virtaulSource
 
 
@@ -176,7 +205,15 @@ class AudioCapture(Process):
 
         
         # get the new audioFrame at 16kHz
-        newAudioFrame = audioFrameCurrent16kHz 
+        newAudioFrame = audioFrameCurrent16kHz
+        
+        # print(audioBufferInQueue)
+        # test = audioBufferInQueue.get()
+        
+        # test = globalTest.getCount()
+        # print(test)
+        # globalTest.setCount(5)
+        # print(globalTest.getCount())
 
         # if(count == 19):
         #     audioBufferInQueue.put(audioBufferTestTempBerkkan)
@@ -201,7 +238,7 @@ class AudioCapture(Process):
         #     audioBufferOut.extend(dnnModelResult)
         #     # print("audioBufferOut after extend length: \t" + str(len(audioBufferOut)))
 
-        # # get the first 128 samples
+        # # # get the first 128 samples
         # outputForUpsampling = audioBufferOut[:128]
 
         # # remove the first 128 samples
@@ -210,10 +247,10 @@ class AudioCapture(Process):
         # print(f'audioBufferOut: {len(audioBufferOut)}, count: {count}')
 
 
-         # Upsample from 8 kHz 48 kHz
+        # Upsample from 8 kHz 48 kHz
         dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
         # print("data: " + str(dataCurrentOut32kHz.shape))
-        dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = newAudioFrame # outputForUpsampling
+        dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = newAudioFrame # outputForUpsampling # newAudioFrame
         dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
 
 

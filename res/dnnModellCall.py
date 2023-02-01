@@ -1,6 +1,7 @@
 from multiprocessing import Process
 import time
 import global_variables as gv
+import audioCapture as ac
 
 
 class DnnModelCall(Process):
@@ -16,8 +17,10 @@ class DnnModelCall(Process):
     def run(self):
         print("DnnModelCall: run")
         while True:
-            if(not gv.audioBufferInQueue.empty()):
-                gv.trigger.get()
+            # print("RUNNNNN")
+            # print(len(ac.testBufferOut))
+            if(not ac.testBufferIn.empty()):
+                # gv.trigger.get()
                 k = 0
                 audioBufferIn = gv.audioBufferInQueue.get() # [0] * 3000 # 
                 # audioBufferIn = self.audioBuffer.get()

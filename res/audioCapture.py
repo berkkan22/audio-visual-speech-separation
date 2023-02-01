@@ -13,12 +13,17 @@ client = jack.Client("AVSS")
 
 event = threading.Event()
 
+testBufferIn = gv.audioBufferInQueue
+testBufferOut = gv.audioBufferOut
 
 class AudioCaptureNew(Process):
     
-    def __init__(self):
+    def __init__(self, audioBufferInQueue):
         super().__init__()
-        print("AudioCapture: init")     
+        print("AudioCapture: init")
+        
+        global testQueue
+        testQueue = audioBufferInQueue
         
     def run(self):
         global soundFile
@@ -83,6 +88,11 @@ class AudioCaptureNew(Process):
     def process(frame):
         assert frame == client.blocksize
         
+        global testBufferIn
+        global testBufferOut
+        
+        global testQueue
+        
         # play virtualSources on the right speaker (headset)
         virtualSource = virtaulSources(soundFile, soundPos, client,  playActive, spkGainAbs)
         client.outports[1].get_array()[:] = virtualSource
@@ -98,20 +108,23 @@ class AudioCaptureNew(Process):
         
         # get the new audioFrame at 16kHz
         newAudioFrame = audioFrameCurrent16kHz
+        # print("newAudioFrame length: \t" + str(len(newAudioFrame)))
         
-        gv.audioBufferInQueue.put(newAudioFrame)
+        testQueue.put(newAudioFrame)
         
         if(not gv.dnnOutQueue.empty()):
+            print("not empty")
             dnnModelResult = gv.dnnOutQueue.get()
-            gv.audioBufferOut.extend(dnnModelResult)
-            print("audioBufferOut after extend length: \t" + str(len(gv.audioBufferOut)))
+            testBufferOut.extend(dnnModelResult)
+            # print("audioBufferOut after extend length: \t" + str(len(gv.audioBufferOut)))
 
+        print("audioBufferOut length: \t" + str(len(testBufferOut)))
         # get the first 128 samples
-        outputForUpsampling = gv.audioBufferOut[:128]
-        print("outputForUpsampling length: \t" + str(len(outputForUpsampling)))
+        outputForUpsampling = testBufferOut[:128]
+        # print("outputForUpsampling length: \t" + str(len(outputForUpsampling)))
 
         # remove the first 128 samples
-        gv.audioBufferOut = gv.audioBufferOut[128:]
+        testBufferOut = testBufferOut[128:]
 
         # Upsample from 8 kHz 48 kHz
         dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
