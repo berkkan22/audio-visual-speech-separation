@@ -8,6 +8,14 @@ import jack
 import numpy
 from dnnModellCall import DnnModelCall
 from audioCapture import AudioCaptureNew
+from global_variables import *
+import jack
+import threading
+from multiprocessing import Process, Queue
+import numpy as np
+import librosa
+from helperFunctions import *
+from global_variables import *
 
 
 if __name__ == '__main__':
@@ -20,20 +28,20 @@ if __name__ == '__main__':
     """
 
     # initilize queue to share data between processes on frame per 0.04 s
-    videoFrameQueue = Queue()
 
     # init audioFrameQueue
-    audioBufferInQueue = Queue()
+    # audioBufferInQueue = Queue()
     # fill the audioBufferInQueue with 0
     # audioBufferInQueue.put([0] * 40800)  # numpy geht nicht weil zu groß
 
-    trigger = Queue()
+    
+    # testGlobal = GlobalTestClass(audioBufferInQueue)
 
 
     # dnnOutQueue for continous output
-    dnnOutQueue = Queue()
-    dnnModelCall = DnnModelCall(
-        dnnOutQueue, videoFrameQueue, audioBufferInQueue, trigger)
+    # dnnModelCall = DnnModelCall(
+    #     dnnOutQueue, videoFrameQueue, audioBufferInQueue, trigger)
+    dnnModelCall = DnnModelCall()
     dnnModelCall.start()
 
 
@@ -44,7 +52,7 @@ if __name__ == '__main__':
 
 
     # add AudioCaputure as process
-    audioCapture = AudioCaptureNew(audioBufferInQueue) # AudioCapture(audioBufferInQueue, videoFrameQueue, dnnOutQueue)
+    audioCapture = AudioCaptureNew() # AudioCapture(audioBufferInQueue, videoFrameQueue, dnnOutQueue)
     audioCapture.start()
     
     #! Wait for them to finish which will never happen because it is a True loop

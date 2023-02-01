@@ -35,7 +35,7 @@ AUDIO_BUFFER_IN_SIZE = 40800
 
 # this is the output buffer. The size is also the limitation
 # for the process to be in realtime. For more please read the bachelor thesis at # TODO: chapter of this part
-AUDIO_BUFFER_OUT_SIZE = 2560 * 2
+AUDIO_BUFFER_OUT_SIZE = 2560 * 10
 
 
 # video capture device and openCV variables
@@ -45,3 +45,12 @@ FPS_RATE= 25 # because it fits perfect to the audio frames?
 FRAME_HEIGHT = 1
 FRAME_WIDHT = 1
 FRAME_CHANNELS = 3
+
+from multiprocessing import Queue
+
+audioBufferInQueue = Queue()
+dnnOutQueue = Queue()
+videoFrameQueue = Queue()
+trigger = Queue()
+
+audioBufferOut = [0] * AUDIO_BUFFER_OUT_SIZE
