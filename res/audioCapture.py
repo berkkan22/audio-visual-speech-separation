@@ -28,7 +28,6 @@ class AudioCaptureNew(Process):
         audioBufferInQueue = audioBufferInQueueParam
         audioBufferDNNOut = audioBufferDNNOutParam
         audioOutputBuffer = [0] * AUDIO_BUFFER_OUT_SIZE
-        localBuffer = [0] * (40800 // 8)
         count = 0
 
     def run(self):
@@ -126,37 +125,23 @@ class AudioCaptureNew(Process):
         newAudioFrame = audioFrameCurrent16kHz
         
 
-        # add buffer
-        # if(count == 20):
         audioBufferInQueue.put(newAudioFrame)
-        #     print("Put")
-        #     count = 0
-        # else:
-        #     localBuffer = removeFirstFrameAndAddNewFrame(localBuffer, newAudioFrame)
-        #     count += 1
-
-
-        # audioBufferInQueue.put(newAudioFrame)
-
-
 
         
         if(not audioBufferDNNOut.empty()):
             # print("not empty")
-            dnnModelResult = audioBufferDNNOut.get()
+            print(audioBufferDNNOut.qsize())
+            dnnModelResult = audioBufferDNNOut.get() # understand ??? we also get here 40800 audiosamples why does it work
             audioOutputBuffer.extend(dnnModelResult)
 
-        # print("audioBufferOut length: \t" + str(len(testBufferOut)))
         # get the first 128 samples
         outputForUpsampling = audioOutputBuffer[:128]
-        # print("outputForUpsampling length: \t" + str(len(outputForUpsampling)))
 
         # remove the first 128 samples
         audioOutputBuffer = audioOutputBuffer[128:]
 
         # Upsample from 8 kHz 48 kHz
         dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
-        # print("data: " + str(dataCurrentOut32kHz.shape))
         dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling # outputForUpsampling # newAudioFrame
         dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
 
