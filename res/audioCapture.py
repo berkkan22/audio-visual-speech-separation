@@ -1,11 +1,13 @@
-import jack
-import threading
+import jack # ??? why does this need to be on top????
+
 from multiprocessing import Process, Queue
+from scipy import signal
 import numpy as np
+import threading
 import librosa
+
 from helperFunctions import *
 from global_variables import *
-from scipy import signal
 
 
 
@@ -22,7 +24,6 @@ class AudioCaptureNew(Process):
         global audioBufferInQueue
         global audioBufferDNNOut
         global audioOutputBuffer
-        global localBuffer
         global count
 
         audioBufferInQueue = audioBufferInQueueParam
@@ -44,7 +45,7 @@ class AudioCaptureNew(Process):
             print("unique name {0!r} assigned".format(client.name))
 
 
-        samplerate = 48000
+        samplerate = 48000 # audio file samplerate
         audioPath = 'resources/misc/gerkmannFrintrop.wav' # r'resources\misc\gerkmannFrintrop.wav' # "/export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav" 
 
         # Changing to 32000 for the current settings
@@ -101,7 +102,6 @@ class AudioCaptureNew(Process):
         global audioBufferInQueue
         global audioBufferDNNOut
         global audioOutputBuffer
-        global localBuffer
         global count
 
         
@@ -112,26 +112,21 @@ class AudioCaptureNew(Process):
         
         # get the input of the mic
         # audioFrameCurrent32kHz = client.inports[0].get_array()[:]
-        # virtualSources
+        # get the input of the virtualSources
         audioFrameCurrent32kHz = client.outports[1].get_array()[:]
 
-        # Downsample from 32 kHz to 16 kHz samplerate
+        # Downsample from 32kHz to 16kHz samplerate
         # ATTENTION: Signal must be prefiltered with low pass at Nyquist (< 4 kHz)
         audioFrameCurrent32kHz, FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(b, a, audioFrameCurrent32kHz, zi=FILTER_STATES_LP_DOWN_SAMPLE)
         audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
 
         
         # get the new audioFrame at 16kHz
-        newAudioFrame = audioFrameCurrent16kHz
-        
-
-        audioBufferInQueue.put(newAudioFrame)
+        audioBufferInQueue.put(audioFrameCurrent16kHz)
 
         
         if(not audioBufferDNNOut.empty()):
-            # print("not empty")
-            # print(audioBufferDNNOut.qsize())
-            dnnModelResult = audioBufferDNNOut.get() # understand ??? we also get here 40800 audiosamples why does it work
+            dnnModelResult = audioBufferDNNOut.get()
             audioOutputBuffer.extend(dnnModelResult)
 
         # get the first 128 samples
@@ -140,15 +135,15 @@ class AudioCaptureNew(Process):
         # remove the first 128 samples
         audioOutputBuffer = audioOutputBuffer[128:]
 
-        # Upsample from 8 kHz 48 kHz
+        # Upsample from 16kHz 32kHz
         dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
-        dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling # outputForUpsampling # newAudioFrame
+        dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling
         dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
 
 
         # output
-        client.outports[0].get_array()[:] = dataCurrentOut32kHz # audioFrameCurrent32kHz # client.inports[0].get_array() # dataCurrentOut32kHz # client.inports[0].get_array() # dataCurrentOut32kHz
-        
+        client.outports[0].get_array()[:] = dataCurrentOut32kHz 
+
     
     @client.set_shutdown_callback
     def shutdown(status, reason):
