@@ -22,11 +22,15 @@ class AudioCaptureNew(Process):
         global audioBufferInQueue
         global audioBufferDNNOut
         global audioOutputBuffer
+        global localBuffer
+        global count
 
         audioBufferInQueue = audioBufferInQueueParam
         audioBufferDNNOut = audioBufferDNNOutParam
         audioOutputBuffer = [0] * AUDIO_BUFFER_OUT_SIZE
-        
+        localBuffer = [0] * (40800 // 8)
+        count = 0
+
     def run(self):
         global soundFile
         global soundPos
@@ -98,6 +102,8 @@ class AudioCaptureNew(Process):
         global audioBufferInQueue
         global audioBufferDNNOut
         global audioOutputBuffer
+        global localBuffer
+        global count
 
         
         # play virtualSources on the right speaker (headset)
@@ -118,9 +124,22 @@ class AudioCaptureNew(Process):
         
         # get the new audioFrame at 16kHz
         newAudioFrame = audioFrameCurrent16kHz
-        # print("newAudioFrame length: \t" + str(len(newAudioFrame)))
         
+
+        # add buffer
+        # if(count == 20):
         audioBufferInQueue.put(newAudioFrame)
+        #     print("Put")
+        #     count = 0
+        # else:
+        #     localBuffer = removeFirstFrameAndAddNewFrame(localBuffer, newAudioFrame)
+        #     count += 1
+
+
+        # audioBufferInQueue.put(newAudioFrame)
+
+
+
         
         if(not audioBufferDNNOut.empty()):
             # print("not empty")
