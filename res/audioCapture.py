@@ -4,7 +4,7 @@ from multiprocessing import Process, Queue
 import numpy as np
 import librosa
 from helperFunctions import *
-import global_variables as gv 
+from global_variables import *
 from scipy import signal
 
 
@@ -13,17 +13,19 @@ client = jack.Client("AVSS")
 
 event = threading.Event()
 
-testBufferIn = gv.audioBufferInQueue
-testBufferOut = gv.audioBufferOut
-
 class AudioCaptureNew(Process):
     
-    def __init__(self, audioBufferInQueue):
+    def __init__(self, audioBufferInQueueParam, audioBufferDNNOutParam):
         super().__init__()
         print("AudioCapture: init")
         
-        global testQueue
-        testQueue = audioBufferInQueue
+        global audioBufferInQueue
+        global audioBufferDNNOut
+        global audioOutputBuffer
+
+        audioBufferInQueue = audioBufferInQueueParam
+        audioBufferDNNOut = audioBufferDNNOutParam
+        audioOutputBuffer = [0] * AUDIO_BUFFER_OUT_SIZE
         
     def run(self):
         global soundFile
@@ -40,7 +42,7 @@ class AudioCaptureNew(Process):
 
 
         samplerate = 48000
-        audioPath = r'resources\misc\gerkmannFrintrop.wav' # "/export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav" 
+        audioPath = 'resources/misc/gerkmannFrintrop.wav' # r'resources\misc\gerkmannFrintrop.wav' # "/export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav" 
 
         # Changing to 32000 for the current settings
         soundFile = []
@@ -87,50 +89,57 @@ class AudioCaptureNew(Process):
     @client.set_process_callback
     def process(frame):
         assert frame == client.blocksize
+
+            
+        global FILTER_STATES_LP_DOWN_SAMPLE
+        global FILTER_STATES_LP_UP_SAMPLE_CHANNEL0
+
         
-        global testBufferIn
-        global testBufferOut
-        
-        global testQueue
+        global audioBufferInQueue
+        global audioBufferDNNOut
+        global audioOutputBuffer
+
         
         # play virtualSources on the right speaker (headset)
         virtualSource = virtaulSources(soundFile, soundPos, client,  playActive, spkGainAbs)
         client.outports[1].get_array()[:] = virtualSource
+
         
         # get the input of the mic
-        audioFrameCurrent32kHz = client.inports[0].get_array()[:]
+        # audioFrameCurrent32kHz = client.inports[0].get_array()[:]
+        # virtualSources
+        audioFrameCurrent32kHz = client.outports[1].get_array()[:]
 
         # Downsample from 32 kHz to 16 kHz samplerate
         # ATTENTION: Signal must be prefiltered with low pass at Nyquist (< 4 kHz)
-        audioFrameCurrent32kHz, gv.FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(gv.b, gv.a, audioFrameCurrent32kHz, zi=gv.FILTER_STATES_LP_DOWN_SAMPLE)
-        audioFrameCurrent16kHz = audioFrameCurrent32kHz[::gv.DOWN_SAMPLING_FACTOR]
+        audioFrameCurrent32kHz, FILTER_STATES_LP_DOWN_SAMPLE = signal.lfilter(b, a, audioFrameCurrent32kHz, zi=FILTER_STATES_LP_DOWN_SAMPLE)
+        audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
 
         
         # get the new audioFrame at 16kHz
         newAudioFrame = audioFrameCurrent16kHz
         # print("newAudioFrame length: \t" + str(len(newAudioFrame)))
         
-        testQueue.put(newAudioFrame)
+        audioBufferInQueue.put(newAudioFrame)
         
-        if(not gv.dnnOutQueue.empty()):
-            print("not empty")
-            dnnModelResult = gv.dnnOutQueue.get()
-            testBufferOut.extend(dnnModelResult)
-            # print("audioBufferOut after extend length: \t" + str(len(gv.audioBufferOut)))
+        if(not audioBufferDNNOut.empty()):
+            # print("not empty")
+            dnnModelResult = audioBufferDNNOut.get()
+            audioOutputBuffer.extend(dnnModelResult)
 
-        print("audioBufferOut length: \t" + str(len(testBufferOut)))
+        # print("audioBufferOut length: \t" + str(len(testBufferOut)))
         # get the first 128 samples
-        outputForUpsampling = testBufferOut[:128]
+        outputForUpsampling = audioOutputBuffer[:128]
         # print("outputForUpsampling length: \t" + str(len(outputForUpsampling)))
 
         # remove the first 128 samples
-        testBufferOut = testBufferOut[128:]
+        audioOutputBuffer = audioOutputBuffer[128:]
 
         # Upsample from 8 kHz 48 kHz
         dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
         # print("data: " + str(dataCurrentOut32kHz.shape))
-        dataCurrentOut32kHz[::gv.DOWN_SAMPLING_FACTOR] = outputForUpsampling # outputForUpsampling # newAudioFrame
-        dataCurrentOut32kHz, gv.FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(gv.DOWN_SAMPLING_FACTOR*gv.b, gv.a, dataCurrentOut32kHz, zi=gv.FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
+        dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling # outputForUpsampling # newAudioFrame
+        dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
 
 
         # output
