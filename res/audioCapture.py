@@ -130,7 +130,7 @@ class AudioCaptureNew(Process):
         
         if(not audioBufferDNNOut.empty()):
             # print("not empty")
-            print(audioBufferDNNOut.qsize())
+            # print(audioBufferDNNOut.qsize())
             dnnModelResult = audioBufferDNNOut.get() # understand ??? we also get here 40800 audiosamples why does it work
             audioOutputBuffer.extend(dnnModelResult)
 

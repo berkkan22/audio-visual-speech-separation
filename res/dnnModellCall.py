@@ -28,9 +28,9 @@ class DnnModelCall(Process):
 
             # if(len(localBuffer) >= 40800):
             if(count >= COUNT):
-                print("Start")
+                # print("Start")
                 audioBuffer = localBuffer
-                print(len(localBuffer))
+                # print(len(localBuffer))
                 # print(len(audioBuffer[-2560::]))
                 time.sleep(0.1) # laufzeit von DNN
                 self.audioBufferDNNOutParam.put(audioBuffer[(DNN_AUDIO_FRAME_SIZE*-COUNT)::])
