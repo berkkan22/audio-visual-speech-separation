@@ -1,6 +1,6 @@
 from multiprocessing import Process
 import cv2
-# import acapture
+import acapture
 import mediapipe as mp
 import time
 import numpy as np

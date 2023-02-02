@@ -24,9 +24,22 @@ def removeFirstFrameAndAddNewFrame(audioBuffer, newAudioFrame):
     return audioBuffer
 
 def virtaulSources(soundFile, soundPos, client, spkGainAbs, playActive):
+    """
+        Creates the virtual sources loop
+
+        Args:
+            soundFile (list): the sound sample. Each file is a new element in the list
+            soundPos (list<int>): is the position of the current sound file
+            client (Client): the jack client to get the blocksize
+            spkGainAbs:
+            playActive:
+    """
+    
+    VOLUME = 0.1
+
     if soundPos[0]+client.blocksize > soundFile[0].size:
         soundPos[0] = 0
-    virtaulSource = soundFile[0][soundPos[0]:soundPos[0]+client.blocksize] * 0.1 #* spkGainAbs[0] * playActive[0]
+    virtaulSource = soundFile[0][soundPos[0]:soundPos[0]+client.blocksize] * VOLUME #* spkGainAbs[0] * playActive[0]
     # print(f'{len(audioFrameCurrent32kHz)}')
     soundPos[0] += client.blocksize #* playActive[0]
     

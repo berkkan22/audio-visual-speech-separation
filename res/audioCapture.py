@@ -1,11 +1,12 @@
-import jack
+from multiprocessing import Process
 import threading
-from multiprocessing import Process, Queue
+import jack
 import numpy as np
 import librosa
+from scipy import signal
+
 from helperFunctions import *
 from global_variables import *
-from scipy import signal
 
 
 
@@ -13,8 +14,8 @@ client = jack.Client("AVSS")
 
 event = threading.Event()
 
+
 class AudioCaptureNew(Process):
-    
     def __init__(self, audioBufferInQueueParam, audioBufferDNNOutParam):
         super().__init__()
         print("AudioCapture: init")
@@ -22,7 +23,6 @@ class AudioCaptureNew(Process):
         global audioBufferInQueue
         global audioBufferDNNOut
         global audioOutputBuffer
-        global localBuffer
         global count
 
         audioBufferInQueue = audioBufferInQueueParam
@@ -44,15 +44,14 @@ class AudioCaptureNew(Process):
             print("unique name {0!r} assigned".format(client.name))
 
 
-        samplerate = 48000
+        samplerate = 48000 # audio file sample rate
         audioPath = 'resources/misc/gerkmannFrintrop.wav' # r'resources\misc\gerkmannFrintrop.wav' # "/export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav" 
 
         # Changing to 32000 for the current settings
         soundFile = []
-        TMP_samplerate = 32000
+        TMP_samplerate = SAMPLERATE
         sample_48k = librosa.load(audioPath, sr=samplerate)[0]
         sample = librosa.resample(sample_48k, orig_sr=samplerate, target_sr=TMP_samplerate)
-        # print(f'{sample.shape=}')
         soundFile.append(sample)
 
         soundPos = np.zeros(1, dtype="int32")
@@ -101,7 +100,6 @@ class AudioCaptureNew(Process):
         global audioBufferInQueue
         global audioBufferDNNOut
         global audioOutputBuffer
-        global localBuffer
         global count
 
         
@@ -112,7 +110,7 @@ class AudioCaptureNew(Process):
         
         # get the input of the mic
         # audioFrameCurrent32kHz = client.inports[0].get_array()[:]
-        # virtualSources
+        # get the virtualScources as input
         audioFrameCurrent32kHz = client.outports[1].get_array()[:]
 
         # Downsample from 32 kHz to 16 kHz samplerate
@@ -121,17 +119,12 @@ class AudioCaptureNew(Process):
         audioFrameCurrent16kHz = audioFrameCurrent32kHz[::DOWN_SAMPLING_FACTOR]
 
         
-        # get the new audioFrame at 16kHz
-        newAudioFrame = audioFrameCurrent16kHz
-        
-
-        audioBufferInQueue.put(newAudioFrame)
+        # put each audio frame in the queue
+        audioBufferInQueue.put(audioFrameCurrent16kHz)
 
         
         if(not audioBufferDNNOut.empty()):
-            # print("not empty")
-            # print(audioBufferDNNOut.qsize())
-            dnnModelResult = audioBufferDNNOut.get() # understand ??? we also get here 40800 audiosamples why does it work
+            dnnModelResult = audioBufferDNNOut.get()
             audioOutputBuffer.extend(dnnModelResult)
 
         # get the first 128 samples
@@ -140,21 +133,20 @@ class AudioCaptureNew(Process):
         # remove the first 128 samples
         audioOutputBuffer = audioOutputBuffer[128:]
 
-        # Upsample from 8 kHz 48 kHz
+        # Upsample from 16kHz 32kHz
         dataCurrentOut32kHz = np.zeros_like(audioFrameCurrent32kHz)
-        dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling # outputForUpsampling # newAudioFrame
+        dataCurrentOut32kHz[::DOWN_SAMPLING_FACTOR] = outputForUpsampling
         dataCurrentOut32kHz, FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = signal.lfilter(DOWN_SAMPLING_FACTOR*b, a, dataCurrentOut32kHz, zi=FILTER_STATES_LP_UP_SAMPLE_CHANNEL0)
 
 
-        # output
-        client.outports[0].get_array()[:] = dataCurrentOut32kHz # audioFrameCurrent32kHz # client.inports[0].get_array() # dataCurrentOut32kHz # client.inports[0].get_array() # dataCurrentOut32kHz
-        
+        # output the upsampled audio
+        client.outports[0].get_array()[:] = dataCurrentOut32kHz 
+
     
     @client.set_shutdown_callback
     def shutdown(status, reason):
         print("JACK shutdown!")
         print("status:", status)
         print("reason:", reason)
-
 
         event.set()

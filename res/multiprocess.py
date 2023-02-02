@@ -1,21 +1,10 @@
-# from capVideoMultiprocessing import capVideoFunc
-from multiprocessing import Process, Queue, Array
-import cv2
-# from jackClient_acssMultiprocessing import AudioCapture
-from syncLoop import SyncLoop
+from multiprocessing import Queue
+
+from helperFunctions import *
+
 from videoCapture import CaptureVideo
-import jack
-import numpy
 from dnnModellCall import DnnModelCall
 from audioCapture import AudioCaptureNew
-import jack
-import threading
-from multiprocessing import Process, Queue
-import numpy as np
-import librosa
-from helperFunctions import *
-import global_variables as gv
-from scipy import signal
 
 
 if __name__ == '__main__':
@@ -32,20 +21,21 @@ if __name__ == '__main__':
     videoFrameQueue = Queue()
 
 
+    # DNN call as process
     dnnModelCall = DnnModelCall(audioBufferInQueue, audioBufferDNNOut)
     dnnModelCall.start()
 
 
-    # # add VideoCaputure as process
-    captureVideo = CaptureVideo(videoFrameQueue, 0)
-    captureVideo.start()
+    # VideoCaputure as process
+    # captureVideo = CaptureVideo(videoFrameQueue, 0)
+    # captureVideo.start()
 
 
-    # add AudioCaputure as process
+    # AudioCaputure as process
     audioCapture = AudioCaptureNew(audioBufferInQueue, audioBufferDNNOut)
     audioCapture.start()
     
     #! Wait for them to finish which will never happen because it is a True loop
     dnnModelCall.join()
-    captureVideo.join()
+    # captureVideo.join()
     audioCapture.join()

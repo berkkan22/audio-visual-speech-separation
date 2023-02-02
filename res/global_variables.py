@@ -34,7 +34,7 @@ FILTER_STATES_LP_UP_SAMPLE_CHANNEL0 = np.zeros(ANTI_ALIASING_FILTER_ORDER)
 AUDIO_BUFFER_IN_SIZE = 40800
 
 
-COUNT = 16
+COUNT = 20
 # this is the output buffer. The size is also the limitation
 # for the process to be in realtime. For more please read the bachelor thesis at # TODO: chapter of this part
 AUDIO_BUFFER_OUT_SIZE = (DNN_AUDIO_FRAME_SIZE*COUNT) * 2 # 2560 * 10 # 2560 * 10
@@ -47,12 +47,3 @@ FPS_RATE= 25 # because it fits perfect to the audio frames?
 FRAME_HEIGHT = 1
 FRAME_WIDHT = 1
 FRAME_CHANNELS = 3
-
-from multiprocessing import Queue
-
-# audioBufferInQueue = Queue()
-# dnnOutQueue = Queue()
-videoFrameQueue = Queue()
-trigger = Queue()
-
-audioBufferOut = [0] * AUDIO_BUFFER_OUT_SIZE
