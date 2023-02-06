@@ -1,6 +1,6 @@
 import jack # ??? why does this need to be on top????
 
-from multiprocessing import Process, Queue
+from torch.multiprocessing import *
 from scipy import signal
 import numpy as np
 import threading
@@ -20,6 +20,8 @@ class AudioCaptureNew(Process):
     def __init__(self, audioBufferInQueueParam, audioBufferDNNOutParam):
         super().__init__()
         print("AudioCapture: init")
+
+        set_start_method("fork", force=True)
         
         global audioBufferInQueue
         global audioBufferDNNOut
@@ -90,7 +92,7 @@ class AudioCaptureNew(Process):
             except KeyboardInterrupt:
                 print("\nInterrupted by user")
                 
-                
+
     @client.set_process_callback
     def process(frame):
         assert frame == client.blocksize
@@ -132,6 +134,7 @@ class AudioCaptureNew(Process):
 
         # get the first 128 samples
         outputForUpsampling = audioOutputBuffer[:128]
+        print("AudioBuffer: " + str(len(audioOutputBuffer)))
 
         # remove the first 128 samples
         audioOutputBuffer = audioOutputBuffer[128:]

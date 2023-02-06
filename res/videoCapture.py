@@ -1,4 +1,4 @@
-from multiprocessing import Process
+from torch.multiprocessing import Process
 import cv2
 # import acapture
 import mediapipe as mp
@@ -36,9 +36,9 @@ class CaptureVideo(Process):
 
         while(True):
             # Capture frame-by-frame
-            # cap.set(cv2.CAP_PROP_FPS, FPS_RATE)
+            cap.set(cv2.CAP_PROP_FPS, FPS_RATE)
             ref, frame = cap.read()
-            frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+            # frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
             frame = cv2.flip(frame, 1)
 
             height = frame.shape[0]
@@ -68,7 +68,7 @@ class CaptureVideo(Process):
                 print("Change Camera to face " + str(self.detectFace0))
                 self.detectFace0 = 0 if self.detectFace0 == 1 else 1
 
-        # cap.release()
+        cap.release()
         cv2.destroyAllWindows()
 
     def faceMeshDetection(self, frame):
@@ -157,9 +157,9 @@ class CaptureVideo(Process):
             # Get all the landmarks of the lips
             FACEMESH_LIPS_TUPLE = list(self.mpFaceMesh.FACEMESH_LIPS)
             FACEMESH_LIPS_LIST = []
-            for point in FACEMESH_LIPS_TUPLE:
-                FACEMESH_LIPS_LIST.append(point[0])
-                FACEMESH_LIPS_LIST.append(point[1])
+            for pointdrawRectAroundLips in FACEMESH_LIPS_TUPLE:
+                FACEMESH_LIPS_LIST.append(pointdrawRectAroundLips[0])
+                FACEMESH_LIPS_LIST.append(pointdrawRectAroundLips[1])
 
             # Go through all the landmarks of the lips and get the min and max values
             for point in FACEMESH_LIPS_LIST:
@@ -213,4 +213,18 @@ class CaptureVideo(Process):
         cropedLips = cropedLips[minY:maxY, minX:maxX]
         resizedLips = cv2.resize(
             cropedLips, (100, 100), interpolation=cv2.INTER_NEAREST)
+
+        # print("Croped Lips:" + str(cropedLips.shape))
+
+        # Croped Lips:(71, 76, 3)
+        # Croped Lips:(72, 75, 3)
+        # Croped Lips:(70, 76, 3)
+        # Croped Lips:(67, 73, 3)
+        # Croped Lips:(60, 68, 3)
+        # Croped Lips:(52, 64, 3)
+        # Croped Lips:(52, 64, 3)
+
+        # original
+        # Mouth shape: (208, 96, 96)
+
         return resizedLips

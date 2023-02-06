@@ -1,4 +1,4 @@
-from multiprocessing import Queue
+from torch.multiprocessing import *
 
 from helperFunctions import *
 
@@ -16,23 +16,28 @@ if __name__ == '__main__':
     und dann werden die buffers an den DnnModelCall übergeben
     """
 
+
     audioBufferInQueue = Queue()
     audioBufferDNNOut = Queue()
     videoFrameQueue = Queue()
 
+    
     # DNN call as process
     dnnModelCall = DnnModelCall(audioBufferInQueue, audioBufferDNNOut)
     dnnModelCall.start()
 
 
     # VideoCaputure as process
-    # captureVideo = CaptureVideo(videoFrameQueue, 0)
-    # captureVideo.start()
+    captureVideo = CaptureVideo(videoFrameQueue, 0)
+    captureVideo.start()
 
 
     # AudioCaputure as process
     audioCapture = AudioCaptureNew(audioBufferInQueue, audioBufferDNNOut)
     audioCapture.start()
+
+    methodes = get_all_start_methods()
+    print(methodes)
     
     #! Wait for them to finish which will never happen because it is a True loop
     dnnModelCall.join()
