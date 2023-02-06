@@ -46,7 +46,7 @@ class AudioCaptureNew(Process):
 
 
         samplerate = 48000 # audio file samplerate
-        audioPath = 'resources/misc/gerkmannFrintrop.wav' # r'resources\misc\gerkmannFrintrop.wav' # "/export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav" 
+        audioPath = '/export/scratch/studio/StudioScripts/Demos/AudioVisualSpeechSeparationGitReop/AudioVisualSpeechSeparation/resources/misc/gerkmannFrintrop.wav' # r'resources\misc\gerkmannFrintrop.wav' # "/export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/AudioInput/48k/Speech_Female01.wav" 
 
         # Changing to 32000 for the current settings
         soundFile = []
@@ -64,6 +64,7 @@ class AudioCaptureNew(Process):
         # create port for the input speech ("mixed_speech") and the both speaker
         client.inports.register("mixed_speech")
         client.outports.register("speaker1")
+        client.outports.register("speaker2")
         client.outports.register("virtualSource")
         
         with client:
@@ -107,13 +108,13 @@ class AudioCaptureNew(Process):
         
         # play virtualSources on the right speaker (headset)
         virtualSource = virtaulSources(soundFile, soundPos, client,  playActive, spkGainAbs)
-        client.outports[1].get_array()[:] = virtualSource
+        client.outports[2].get_array()[:] = virtualSource
 
         
         # get the input of the mic
         # audioFrameCurrent32kHz = client.inports[0].get_array()[:]
         # get the input of the virtualSources
-        audioFrameCurrent32kHz = client.outports[1].get_array()[:]
+        audioFrameCurrent32kHz = client.outports[2].get_array()[:]
 
         # Downsample from 32kHz to 16kHz samplerate
         # ATTENTION: Signal must be prefiltered with low pass at Nyquist (< 4 kHz)
@@ -143,6 +144,7 @@ class AudioCaptureNew(Process):
 
         # output
         client.outports[0].get_array()[:] = dataCurrentOut32kHz 
+        client.outports[1].get_array()[:] = dataCurrentOut32kHz 
 
     
     @client.set_shutdown_callback

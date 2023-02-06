@@ -26,8 +26,8 @@ if __name__ == '__main__':
 
 
     # VideoCaputure as process
-    captureVideo = CaptureVideo(videoFrameQueue, 0)
-    captureVideo.start()
+    # captureVideo = CaptureVideo(videoFrameQueue, 0)
+    # captureVideo.start()
 
 
     # AudioCaputure as process
