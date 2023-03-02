@@ -1,6 +1,6 @@
 import jack # ??? why does this need to be on top????
 
-from torch.multiprocessing import *
+from multiprocessing import *
 from scipy import signal
 import numpy as np
 import threading
@@ -14,6 +14,11 @@ from global_variables import *
 client = jack.Client("AVSS")
 
 event = threading.Event()
+
+audioBufferInQueue = None
+audioBufferDNNOut = None
+audioOutputBuffer = None
+count = None
 
 class AudioCaptureNew(Process):
     
@@ -70,7 +75,7 @@ class AudioCaptureNew(Process):
         client.outports.register("virtualSource")
         
         with client:
-            print("AudioCapture: run")
+            # print("AudioCapture: run")
             
             capture = client.get_ports(is_physical=True, is_output=True)
             if not capture:

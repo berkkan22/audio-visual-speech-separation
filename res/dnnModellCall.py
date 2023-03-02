@@ -1,4 +1,4 @@
-from torch.multiprocessing import *
+from multiprocessing import *
 import time
 from helperFunctions import *
 from global_variables import *
@@ -13,8 +13,6 @@ class DnnModelCall(Process):
     def __init__(self, audioBufferInQueueParam, audioBufferDNNOutParam):
         super().__init__()
         print("DnnModelCall: init")
-
-        set_start_method("spawn", force=True)
 
         
         self.audioBufferInQueueParam = audioBufferInQueueParam
@@ -46,12 +44,18 @@ class DnnModelCall(Process):
                 # print(len(audioBuffer[-2560::]))
                 # time.sleep(0.1) # laufzeit von DNN
                 # try:
-                # speaker1, speaker2 = runModel(self.model, self.opt)
+                # print("runModel")
+                start = time.time()
+                speaker1, speaker2 = runModel(self.model, self.opt, audioInput=audioBuffer)
+                end = time.time()
+                print(f"Laufzeit DNN: {end-start}")
+                # print(speaker1)
+                # print(speaker2)
                 # except:
                     # time.sleep(0.1)
                 # finally:
 
-                self.audioBufferDNNOutParam.put(audioBuffer[(DNN_AUDIO_FRAME_SIZE*-COUNT)::])
+                self.audioBufferDNNOutParam.put(speaker2[(DNN_AUDIO_FRAME_SIZE*-COUNT)::])
                 # localBuffer = []
                 count = 0
                 

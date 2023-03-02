@@ -1,4 +1,4 @@
-from torch.multiprocessing import Process
+from multiprocessing import Process
 import cv2
 # import acapture
 import mediapipe as mp
@@ -28,8 +28,8 @@ class CaptureVideo(Process):
 
         self.detectFace0 = 1
 
-        cap = cv2.VideoCapture(self.streamID)
-        # cap = cv2.VideoCapture("res/video540p.mp4")
+        # cap = cv2.VideoCapture(self.streamID)
+        cap = cv2.VideoCapture("res/video540p.mp4")
         # cap = acapture.open(self.streamID) # , acapture.CAP_FFMPEG, 0)
 
         # print("VideoCapture: ", cap.isOpened())
@@ -49,11 +49,21 @@ class CaptureVideo(Process):
 
             faceMeshDetectionFrame, landmarks = self.faceMeshDetection(resized)
             rectAroundLipsFrame, croppedLipsFrame = self.drawRectAroundLips(
-                resized, landmarks)
+                resized, landmarks[0].landmark)
+            rectAroundLipsFrame, croppedLipsFrame = self.drawRectAroundLips(
+                resized, landmarks[1].landmark)
+                
+            # if(self.detectFace0 and landmarks[0]):
+            #     rectAroundLipsFrame, croppedLipsFrame = self.drawRectAroundLips(
+            #         resized, landmarks[0].landmark)
+            # elif(not self.detectFace0 and landmarks[1]):
+            #     rectAroundLipsFrame, croppedLipsFrame = self.drawRectAroundLips(
+            #         resized, landmarks[1].landmark)
 
             # Put the frame with the needed ROI in queue
-            self.queue.put(frame)
+            # self.queue.put(frame)
 
+            # print("show frame")
             cv2.imshow("frame", frame)
             cv2.imshow('faceMeshDetectionFrame', faceMeshDetectionFrame)
             cv2.imshow('drawRectAroundLipsFrame', rectAroundLipsFrame)
@@ -97,32 +107,44 @@ class CaptureVideo(Process):
             for i in range(0, len(self.faceMeshResult.multi_face_landmarks)):
                 if self.faceMeshResult.multi_face_landmarks[i]:
 
+
                     # Puts face number
                     cv2.putText(faceMeshFrame, "Face " + str(i), (int(self.faceMeshResult.multi_face_landmarks[i].landmark[0].x * width - 50), int(
                         self.faceMeshResult.multi_face_landmarks[i].landmark[0].y * height - 50)), FONT, 1, (0, 0, 255), 1)
 
-                    # This code checks if the first face detected is on the left side of the screen
-                    # and if the detectFace0 boolean is true
-                    if(self.faceMeshResult.multi_face_landmarks[i].landmark[0].x * width < width // 2 and self.detectFace0):
-                        self.mpDraw.draw_landmarks(faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i],
+                    self.mpDraw.draw_landmarks(faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i],
                                                    self.mpFaceMesh.FACEMESH_CONTOURS,
                                                    connection_drawing_spec=self.landmarkConnectionSpecs,
                                                    landmark_drawing_spec=self.landmarkDrawingSpecs)
 
-                        return faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i].landmark
+                    # Puts face number
+                    # cv2.putText(faceMeshFrame, "Face " + str(i), (int(self.faceMeshResult.multi_face_landmarks[i].landmark[0].x * width - 50), int(
+                    #     self.faceMeshResult.multi_face_landmarks[i].landmark[0].y * height - 50)), FONT, 1, (0, 0, 255), 1)
 
-                    elif(self.faceMeshResult.multi_face_landmarks[i].landmark[0].x * width > width // 2 and not self.detectFace0):
-                        self.mpDraw.draw_landmarks(faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i],
-                                                   self.mpFaceMesh.FACEMESH_CONTOURS,
-                                                   connection_drawing_spec=self.landmarkConnectionSpecs,
-                                                   landmark_drawing_spec=self.landmarkDrawingSpecs)
+                    # # This code checks if the first face detected is on the left side of the screen
+                    # # and if the detectFace0 boolean is true
+                    # if(self.faceMeshResult.multi_face_landmarks[i].landmark[0].x * width < width // 2 and self.detectFace0):
+                    #     self.mpDraw.draw_landmarks(faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i],
+                    #                                self.mpFaceMesh.FACEMESH_CONTOURS,
+                    #                                connection_drawing_spec=self.landmarkConnectionSpecs,
+                    #                                landmark_drawing_spec=self.landmarkDrawingSpecs)
 
-                        return faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i].landmark
+                    #     # return faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i].landmark
 
-        noFaceDetected = np.zeros((height, width, 3), np.uint8)
-        cv2.putText(noFaceDetected, "No face detected", (int(
-            width // 2 - 100), int(height // 2)), FONT, 1, (0, 0, 255), 1)
-        return noFaceDetected, None
+                    # elif(self.faceMeshResult.multi_face_landmarks[i].landmark[0].x * width > width // 2 and not self.detectFace0):
+                    #     self.mpDraw.draw_landmarks(faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i],
+                    #                                self.mpFaceMesh.FACEMESH_CONTOURS,
+                    #                                connection_drawing_spec=self.landmarkConnectionSpecs,
+                    #                                landmark_drawing_spec=self.landmarkDrawingSpecs)
+
+                        # return faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i].landmark
+            return faceMeshFrame, self.faceMeshResult.multi_face_landmarks
+
+        return faceMeshFrame
+        # noFaceDetected = np.zeros((height, width, 3), np.uint8)
+        # cv2.putText(noFaceDetected, "No face detected", (int(
+        #     width // 2 - 100), int(height // 2)), FONT, 1, (0, 0, 255), 1)
+        # return noFaceDetected, None
 
     def drawRectAroundLips(self, frame, landmarks):
         """Draws a rectangle around the lips and 
