@@ -7,10 +7,12 @@ import numpy as np
 from global_variables import *
 
 class CaptureVideo(Process):
-    def __init__(self, queue, streamID):
+    def __init__(self, face1Queue, face2Queue, streamID):
         super().__init__()
         print("VideoCapture: init")
-        self.queue = queue
+        self.face1Queue = face1Queue
+        self.face2Queue = face2Queue
+
         self.streamID = streamID
 
     def run(self):
@@ -28,8 +30,8 @@ class CaptureVideo(Process):
 
         self.detectFace0 = 1
 
-        # cap = cv2.VideoCapture(self.streamID)
-        cap = cv2.VideoCapture("res/video540p.mp4")
+        cap = cv2.VideoCapture(self.streamID)
+        # cap = cv2.VideoCapture("res/video540p.mp4")
         # cap = acapture.open(self.streamID) # , acapture.CAP_FFMPEG, 0)
 
         # print("VideoCapture: ", cap.isOpened())
@@ -49,29 +51,32 @@ class CaptureVideo(Process):
 
             faceMeshDetectionFrame, landmarks = self.faceMeshDetection(resized)
 
+            croppedLipsFrame1 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
+            croppedLipsFrame2 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
+            rectAroundLipsFrame1 = np.zeros((height, width, ROI_FRAME_CHANNELS), dtype=np.uint8)
+            rectAroundLipsFrame2 = np.zeros((height, width, ROI_FRAME_CHANNELS), dtype=np.uint8)
+
             if(faceMeshDetectionFrame is not None and landmarks is not None):
                 for i in range(0, len(landmarks)):
-                    if(i == 0):
-                        # croppedLipsFrame1 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
-                        if(landmarks[i].landmark[0].x * width < width // 2):
-                            rectAroundLipsFrame1, croppedLipsFrame1 = self.drawRectAroundLips(
-                                resized, landmarks[i].landmark)        
-                    if(i == 1):
-                        # croppedLipsFrame2 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
-                        if(landmarks[i].landmark[0].x * width > width // 2):
-                            rectAroundLipsFrame2, croppedLipsFrame2 = self.drawRectAroundLips(
-                                resized, landmarks[i].landmark)
+                    if(i == 0 and not (landmarks[i].landmark[0].x * width < width // 2)):
+                        croppedLipsFrame1 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
 
-                    # else:
-                    #     croppedLipsFrame1 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
+                    if(i == 1 and not (landmarks[i].landmark[0].x * width > width // 2)):
+                        croppedLipsFrame2 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
 
-                    # else:
-                    #     croppedLipsFrame2 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
-                    
+                    if(landmarks[i].landmark[0].x * width < width // 2):
+                        rectAroundLipsFrame1, croppedLipsFrame1 = self.drawRectAroundLips(
+                            resized, landmarks[i].landmark)
+
+                    if(landmarks[i].landmark[0].x * width > width // 2):
+                        rectAroundLipsFrame2, croppedLipsFrame2 = self.drawRectAroundLips(
+                            resized, landmarks[i].landmark)
+
                     
 
             # Put the frame with the needed ROI in queue
-            # self.queue.put(frame)
+            self.face1Queue.put(croppedLipsFrame1)
+            self.face2Queue.put(croppedLipsFrame2)
 
             # print("show frame")
             # cv2.imshow("frame", frame)
@@ -80,11 +85,9 @@ class CaptureVideo(Process):
             cv2.imshow('drawRectAroundLipsFrame1', rectAroundLipsFrame1)
             cv2.imshow('drawRectAroundLipsFrame2', rectAroundLipsFrame2)
             
-            if(croppedLipsFrame1 is not None):
-                cv2.imshow('croppedFrame1', croppedLipsFrame1)
+            cv2.imshow('croppedFrame1', croppedLipsFrame1)
 
-            if(croppedLipsFrame2 is not None):
-                cv2.imshow('croppedFrame2', croppedLipsFrame2)
+            cv2.imshow('croppedFrame2', croppedLipsFrame2)
 
 
             # need to be in a variable because else it will not work immediately
@@ -230,7 +233,7 @@ class CaptureVideo(Process):
         # TODO: Look up how VisualVoice does the cropping
         cropedLips = cropedLips[minY:maxY, minX:maxX]
         resizedLips = cv2.resize(
-            cropedLips, (100, 100), interpolation=cv2.INTER_NEAREST)
+            cropedLips, (ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT), interpolation=cv2.INTER_NEAREST)
 
         # print("Croped Lips:" + str(cropedLips.shape))
 

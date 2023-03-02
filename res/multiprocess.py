@@ -20,7 +20,8 @@ if __name__ == '__main__':
 
     audioBufferInQueue = Queue()
     audioBufferDNNOut = Queue()
-    videoFrameQueue = Queue()
+    videoFrameFace1Queue = Queue()
+    videoFrameFace2Queue = Queue()
 
     
     # DNN call as process
@@ -29,7 +30,7 @@ if __name__ == '__main__':
 
 
     # VideoCaputure as process
-    captureVideo = CaptureVideo(videoFrameQueue, 1)
+    captureVideo = CaptureVideo(videoFrameFace1Queue, videoFrameFace2Queue, 1)
     captureVideo.start()
 
 

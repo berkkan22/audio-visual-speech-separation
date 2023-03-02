@@ -1,7 +1,7 @@
 from global_variables import AUDIO_FRAME_SIZE, DOWN_SAMPLING_FACTOR
 
 
-def removeFirstFrameAndAddNewFrame(audioBuffer, newAudioFrame):
+def removeFirstAudioFrameAndAddNewAudioFrame(audioBuffer, newAudioFrame):
     """
         Removes the first frame of the [audioBuffer] and 
         adds the new frame [newAudioFrame] to the [audioBuffer]
@@ -22,6 +22,26 @@ def removeFirstFrameAndAddNewFrame(audioBuffer, newAudioFrame):
     audioBuffer.extend(newAudioFrame)
 
     return audioBuffer
+
+def removeFirstVideoFrameAndAddNewVideoFrame(videoBuffer, newvideoFrame):
+    """
+        Removes the first frame of the [videoBuffer] and 
+        adds the new frame [newvideoFrame] to the [videoBuffer]
+        and returns it 
+
+        Args:
+            videoBuffer (list?array): The video buffer with the frames
+            newvideoFrame (numpy.ndarray): The new video frame which will be added to the video buffer
+
+        Return:
+            numpy.ndarray: [videoBuffer] with the new frame at the end
+
+    """
+
+    videoBuffer = videoBuffer[1:]
+    videoBuffer.append(newvideoFrame)
+
+    return videoBuffer
 
 def virtaulSources(soundFile, soundPos, client, spkGainAbs, playActive):
     if soundPos[0]+client.blocksize > soundFile[0].size:
