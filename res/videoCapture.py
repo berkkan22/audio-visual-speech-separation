@@ -48,27 +48,44 @@ class CaptureVideo(Process):
                 frame, (width // 2, height // 2), interpolation=cv2.INTER_AREA)
 
             faceMeshDetectionFrame, landmarks = self.faceMeshDetection(resized)
-            rectAroundLipsFrame, croppedLipsFrame = self.drawRectAroundLips(
-                resized, landmarks[0].landmark)
-            rectAroundLipsFrame, croppedLipsFrame = self.drawRectAroundLips(
-                resized, landmarks[1].landmark)
-                
-            # if(self.detectFace0 and landmarks[0]):
-            #     rectAroundLipsFrame, croppedLipsFrame = self.drawRectAroundLips(
-            #         resized, landmarks[0].landmark)
-            # elif(not self.detectFace0 and landmarks[1]):
-            #     rectAroundLipsFrame, croppedLipsFrame = self.drawRectAroundLips(
-            #         resized, landmarks[1].landmark)
+
+            if(faceMeshDetectionFrame is not None and landmarks is not None):
+                for i in range(0, len(landmarks)):
+                    if(i == 0):
+                        # croppedLipsFrame1 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
+                        if(landmarks[i].landmark[0].x * width < width // 2):
+                            rectAroundLipsFrame1, croppedLipsFrame1 = self.drawRectAroundLips(
+                                resized, landmarks[i].landmark)        
+                    if(i == 1):
+                        # croppedLipsFrame2 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
+                        if(landmarks[i].landmark[0].x * width > width // 2):
+                            rectAroundLipsFrame2, croppedLipsFrame2 = self.drawRectAroundLips(
+                                resized, landmarks[i].landmark)
+
+                    # else:
+                    #     croppedLipsFrame1 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
+
+                    # else:
+                    #     croppedLipsFrame2 = np.zeros((ROI_FRAME_HEIGHT, ROI_FRAME_WIDHT, ROI_FRAME_CHANNELS), dtype=np.uint8)
+                    
+                    
 
             # Put the frame with the needed ROI in queue
             # self.queue.put(frame)
 
             # print("show frame")
-            cv2.imshow("frame", frame)
-            cv2.imshow('faceMeshDetectionFrame', faceMeshDetectionFrame)
-            cv2.imshow('drawRectAroundLipsFrame', rectAroundLipsFrame)
-            if(croppedLipsFrame is not None):
-                cv2.imshow('croppedFrame', croppedLipsFrame)
+            # cv2.imshow("frame", frame)
+            # cv2.imshow('faceMeshDetectionFrame', faceMeshDetectionFrame)
+
+            cv2.imshow('drawRectAroundLipsFrame1', rectAroundLipsFrame1)
+            cv2.imshow('drawRectAroundLipsFrame2', rectAroundLipsFrame2)
+            
+            if(croppedLipsFrame1 is not None):
+                cv2.imshow('croppedFrame1', croppedLipsFrame1)
+
+            if(croppedLipsFrame2 is not None):
+                cv2.imshow('croppedFrame2', croppedLipsFrame2)
+
 
             # need to be in a variable because else it will not work immediately
             pressedKey = cv2.waitKey(1)
@@ -117,30 +134,9 @@ class CaptureVideo(Process):
                                                    connection_drawing_spec=self.landmarkConnectionSpecs,
                                                    landmark_drawing_spec=self.landmarkDrawingSpecs)
 
-                    # Puts face number
-                    # cv2.putText(faceMeshFrame, "Face " + str(i), (int(self.faceMeshResult.multi_face_landmarks[i].landmark[0].x * width - 50), int(
-                    #     self.faceMeshResult.multi_face_landmarks[i].landmark[0].y * height - 50)), FONT, 1, (0, 0, 255), 1)
-
-                    # # This code checks if the first face detected is on the left side of the screen
-                    # # and if the detectFace0 boolean is true
-                    # if(self.faceMeshResult.multi_face_landmarks[i].landmark[0].x * width < width // 2 and self.detectFace0):
-                    #     self.mpDraw.draw_landmarks(faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i],
-                    #                                self.mpFaceMesh.FACEMESH_CONTOURS,
-                    #                                connection_drawing_spec=self.landmarkConnectionSpecs,
-                    #                                landmark_drawing_spec=self.landmarkDrawingSpecs)
-
-                    #     # return faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i].landmark
-
-                    # elif(self.faceMeshResult.multi_face_landmarks[i].landmark[0].x * width > width // 2 and not self.detectFace0):
-                    #     self.mpDraw.draw_landmarks(faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i],
-                    #                                self.mpFaceMesh.FACEMESH_CONTOURS,
-                    #                                connection_drawing_spec=self.landmarkConnectionSpecs,
-                    #                                landmark_drawing_spec=self.landmarkDrawingSpecs)
-
-                        # return faceMeshFrame, self.faceMeshResult.multi_face_landmarks[i].landmark
             return faceMeshFrame, self.faceMeshResult.multi_face_landmarks
 
-        return faceMeshFrame
+        return None, None
         # noFaceDetected = np.zeros((height, width, 3), np.uint8)
         # cv2.putText(noFaceDetected, "No face detected", (int(
         #     width // 2 - 100), int(height // 2)), FONT, 1, (0, 0, 255), 1)
