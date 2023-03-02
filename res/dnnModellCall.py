@@ -34,21 +34,19 @@ class DnnModelCall(Process):
         countVideoFrames = 5
 
         while True:
-            if(not self.audioBufferInQueueParam.empty() and not self.face1Queue.empty() and not self.face2Queue.empty()):
+            # while(not self.audioBufferInQueueParam.empty() and len(localBuffer) <= 40800):
+            while(not self.audioBufferInQueueParam.empty() and countAudioSamples < COUNT):
+                localBuffer = removeFirstAudioFrameAndAddNewAudioFrame(localBuffer, self.audioBufferInQueueParam.get())
+                if(countVideoFrames == 5 and not self.face1Queue.empty() and not self.face2Queue.empty()):
+                    face1Buffer = removeFirstVideoFrameAndAddNewVideoFrame(face1Buffer, self.face1Queue.get())
+                    face2Buffer = removeFirstVideoFrameAndAddNewVideoFrame(face2Buffer, self.face2Queue.get())
 
-                # while(not self.audioBufferInQueueParam.empty() and len(localBuffer) <= 40800):
-                while(not self.audioBufferInQueueParam.empty() and countAudioSamples < COUNT):
-                    localBuffer = removeFirstAudioFrameAndAddNewAudioFrame(localBuffer, self.audioBufferInQueueParam.get())
-                    if(countVideoFrames == 5 and not self.face1Queue.empty() and not self.face2Queue.empty()):
-                        face1Buffer = removeFirstVideoFrameAndAddNewVideoFrame(face1Buffer, self.face1Queue.get())
-                        face2Buffer = removeFirstVideoFrameAndAddNewVideoFrame(face2Buffer, self.face2Queue.get())
+                    countVideoFrames = 0
 
-                        countVideoFrames = 0
-
-                    # localBuffer.extend(self.audioBufferInQueueParam.get())
-                    # print(f"localBuffer: {len(localBuffer)}")
-                    countAudioSamples += 1
-                    countVideoFrames += 1
+                # localBuffer.extend(self.audioBufferInQueueParam.get())
+                # print(f"localBuffer: {len(localBuffer)}")
+                countAudioSamples += 1
+                countVideoFrames += 1
                 
 
             # if(len(localBuffer) >= 40800):

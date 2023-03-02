@@ -3,8 +3,8 @@ from multiprocessing import *
 from helperFunctions import *
 
 from videoCapture import CaptureVideo
-# from dnnModellCall import DnnModelCall
-# from audioCapture import AudioCaptureNew
+from dnnModellCall import DnnModelCall
+from audioCapture import AudioCaptureNew
 
 
 if __name__ == '__main__':
@@ -25,8 +25,8 @@ if __name__ == '__main__':
 
     
     # DNN call as process
-    # dnnModelCall = DnnModelCall(audioBufferInQueue, audioBufferDNNOut)
-    # dnnModelCall.start()
+    dnnModelCall = DnnModelCall(audioBufferInQueue, audioBufferDNNOut, videoFrameFace1Queue, videoFrameFace2Queue)
+    dnnModelCall.start()
 
 
     # VideoCaputure as process
@@ -35,13 +35,13 @@ if __name__ == '__main__':
 
 
     # AudioCaputure as process
-    # audioCapture = AudioCaptureNew(audioBufferInQueue, audioBufferDNNOut)
-    # audioCapture.start()
+    audioCapture = AudioCaptureNew(audioBufferInQueue, audioBufferDNNOut)
+    audioCapture.start()
 
     # methodes = get_all_start_methods()
     # print(methodes)
     
     #! Wait for them to finish which will never happen because it is a True loop
-    # dnnModelCall.join()
+    dnnModelCall.join()
     captureVideo.join()
-    # audioCapture.join()
+    audioCapture.join()
