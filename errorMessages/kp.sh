@@ -1,1 +1,0 @@
-bash -c 'cd ~/anaconda3/bin;source activate base; cd /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/resources/speechSeparation/;CUDA_VISIBLE_DEVICES=1 LD_LIBRARY_PATH=/usr/local/cuda-10.0/lib64 python /export/scratch/studio/StudioScripts/Demos/SpeechEnhancementAndSeparation/resources/speechSeparation/jackClient_speechSeparation.py'
