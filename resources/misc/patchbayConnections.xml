@@ -1,0 +1,76 @@
+<!DOCTYPE patchbay>
+<patchbay version="0.4.5" name="patchbayConnections">
+ <output-sockets>
+  <socket client="system" type="jack-audio" name="system" exclusive="off">
+   <plug>capture_1</plug>
+   <plug>capture_2</plug>
+   <plug>capture_3</plug>
+   <plug>capture_4</plug>
+   <plug>monitor_1</plug>
+   <plug>monitor_2</plug>
+   <plug>monitor_3</plug>
+   <plug>monitor_4</plug>
+  </socket>
+  <socket client="StereoMixer" type="jack-audio" name="StereoMixer" exclusive="off">
+   <plug>outRight</plug>
+   <plug>outLeft</plug>
+  </socket>
+  <socket client="SpeechSeparator" type="jack-audio" name="SpeechSeparator" exclusive="off">
+   <plug>speaker1</plug>
+   <plug>speaker2</plug>
+  </socket>
+  <socket client="SpeechSeparator" type="jack-audio" name="SpeechSeparator 2" exclusive="off">
+   <plug>speaker2</plug>
+  </socket>
+  <socket client="Midi Through" type="alsa-midi" name="Midi Through" exclusive="off">
+   <plug>Midi Through Port-0</plug>
+  </socket>
+  <socket client="US-4x4" type="alsa-midi" name="US-4x4" exclusive="off">
+   <plug>US-4x4 MIDI 1</plug>
+  </socket>
+ </output-sockets>
+ <input-sockets>
+  <socket client="system" type="jack-audio" name="system" exclusive="off">
+   <plug>playback_1</plug>
+   <plug>playback_2</plug>
+   <plug>playback_3</plug>
+   <plug>playback_4</plug>
+  </socket>
+  <socket client="STFTPlotter" type="jack-audio" name="STFTPlotter" exclusive="off">
+   <plug>input</plug>
+  </socket>
+  <socket client="STFTPlotter-01" type="jack-audio" name="STFTPlotter-01" exclusive="off">
+   <plug>input</plug>
+  </socket>
+  <socket client="StereoMixer" type="jack-audio" name="StereoMixer" exclusive="off">
+   <plug>input1</plug>
+   <plug>input2</plug>
+  </socket>
+  <socket client="STFTPlotter-02" type="jack-audio" name="STFTPlotter-02" exclusive="off">
+   <plug>input</plug>
+  </socket>
+  <socket client="SpeechSeparator" type="jack-audio" name="SpeechSeparator" exclusive="off">
+   <plug>mixed_speech</plug>
+  </socket>
+  <socket client="system" type="jack-audio" name="system 2" exclusive="off">
+   <plug>playback_2</plug>
+   <plug>playback_1</plug>
+  </socket>
+  <socket client="Midi Through" type="alsa-midi" name="Midi Through" exclusive="off">
+   <plug>Midi Through Port-0</plug>
+  </socket>
+  <socket client="US-4x4" type="alsa-midi" name="US-4x4" exclusive="off">
+   <plug>US-4x4 MIDI 1</plug>
+  </socket>
+ </input-sockets>
+ <slots/>
+ <cables>
+  <cable input="STFTPlotter" type="jack-audio" output="system"/>
+  <cable input="SpeechSeparator" type="jack-audio" output="system"/>
+  <cable input="system 2" type="jack-audio" output="StereoMixer"/>
+  <cable input="StereoMixer" type="jack-audio" output="SpeechSeparator"/>
+  <cable input="STFTPlotter-01" type="jack-audio" output="SpeechSeparator"/>
+  <cable input="STFTPlotter-02" type="jack-audio" output="SpeechSeparator 2"/>
+ </cables>
+</patchbay>
+
