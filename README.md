@@ -72,7 +72,7 @@ Sometimes the process can not share there queues. This is a known issue and I'm 
 ## Support
 
 If you have trouble with the installation or with running the code or have any other questions feel free to contact me.
-You can reach me throw GitLab @9katirci or via email at berkkan.katirci@studium.uni-hamburg.de or berkkan22@gmail.com
+You can open an issue or can reach me via email at berkkan.katirci@studium.uni-hamburg.de or berkkan22@gmail.com
 
 ## References
 
