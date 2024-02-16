@@ -1,6 +1,6 @@
 # AudioVisualSpeechSeparation
 
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/done.svg)](https://www.repostatus.org/#done)
+![Static Badge](https://img.shields.io/badge/done-done?label=Bachelor%20Status)
 
 This is the repository of my [bachelor thesis](https://github.com/berkkan22/audio-visual-speech-separation/blob/main/Robust_preprocessing_for_real-time_audio-visual_speech_separation_Berkkan_Katirci_7298823.pdf). Here I will write all the code. This includes the video preprocessing with different face-tracking models, audio preprocessing and also the synchronization of the audio and video. Additionally, if time is left, I will create a UI as well. <br>
 The title of my bachelor thesis is **"Robust preprocessing for real-time audio-visual speech separation"**. Audio-visual speech separation is a multi-modal method. This approach uses the audio and video information to separate the speakers. [[1]](#1) <br>
